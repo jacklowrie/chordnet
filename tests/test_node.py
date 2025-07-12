@@ -3,8 +3,8 @@ import pytest
 import hashlib
 from unittest.mock import patch
 
-from chord import Address
-from chord import Node as ChordNode
+from chordnet import Address
+from chordnet import Node as ChordNode
 
 ip = "1.2.3.4"
 port = 5

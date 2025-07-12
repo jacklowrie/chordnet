@@ -4,7 +4,7 @@ import socket
 import threading
 from unittest.mock import Mock, patch
 
-from chord import _Net
+from chordnet import _Net
 
 def test_net_initialization():
     mock_handler = Mock()
