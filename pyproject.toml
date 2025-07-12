@@ -1,0 +1,29 @@
+[project]
+name = "chordnet"
+version = "0.1.0"
+description = "Implementation of the chord peer-to-peer networking protocol, introduced by Stoica et al."
+readme = "README.md"
+authors = [
+    { name = "Jack Lowrie", email = "jacklowrie@me.com" }
+]
+requires-python = ">=3.11"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.7.19,<0.8"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+pythonpath = [
+ "src"
+]
+testpaths = [
+    "tests",
+]
