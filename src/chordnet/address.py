@@ -16,10 +16,10 @@ class Address:
 
     Provides methods for equality comparison and string representation.
     """
+    __slots__= ('key', 'ip', 'port')
     _M = 16
     _SPACE = 2 ** _M
 
-    __slots__: ['key', 'ip', 'port']
 
     def __init__(self, ip, port):
         self.key = self._hash(f"{ip}:{port}")

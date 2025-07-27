@@ -1,7 +1,5 @@
 # node.py
 import sys
-import threading
-import logging
 
 from .address import Address
 from .net import _Net
@@ -246,7 +244,7 @@ class Node:
             if not response or response != 'ALIVE':
                 self.predecessor = None
         
-        except Exception as e:
+        except Exception:
             # Any network error means the predecessor is likely down
             self.predecessor = None
 
