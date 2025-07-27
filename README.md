@@ -1,35 +1,25 @@
 # chordnet
-Python Implementation of the chord protocol, introduced by Stoica et al
+Python implementation of the chord protocol, introduced by Stoica et al
+This library began as a group project for cs536 at Purdue University in
+Fall 2024.
 
 ## Installation
+`pip install chordnet`
+`uv add chordnet`
 
 ## Usage
-`import chordnet as ring`: to stay consistent with the language from the original
-paper, we recommend importing this package as `ring`. This fits with the concept
-of "joining" an existing ring network, or creating a new one (`ring.join(...)`,
-`ring.create()`. Examples follow this practice.
+to stay consistent with the language from the original
+paper, we recommend importing this package as `ring`:
+```python
+from chordnet import Node as ring
+```
+This fits with the concept of "joining" an existing ring network, or creating a
+new one (`ring.join(...)`, `ring.create()`. Examples follow this practice.
 
-## Dependencies
+## High level roadmap
+- [ ] port over code from course project
+- [ ] set up repo/project workflows, including using `uv`
+- [ ] make sure nodes can run on a single computer (same IP, diff't ports)
+- [ ] add robust testing
+- [ ] refactor to use asyncio
 
-## Development
-This project uses `uv`.
-
-
-## Files
-- `src`: contains the library source code.
-  -  `chordnet`: The package.
-      - `__init__.py`: package init file.
-      - `address.py`: Helper class, its objects represent a chord network address.
-      - `net.py`: `_Net` is the helper class that handles networking functions.
-      - `node.py`: `Node` is the public class for interacting with a ring network.
-      - `py.typed`: empty, indicates to IDEs that type annotations are used.
-- `tests`: test code directory (we use `pytest`).
-  -  `test_net.py`: tests for the `_Net` class.
-  -  `test_node.py`: tests for the `Node` class.
-- `.gitignore`: excludes files from version control.
-- `.python-version`: pins to the dev (and min-supported) version.
-- `chord_paper.pdf`: The paper this library implements.
-- `LICENSE`: copy of software license.
-- `pyproject.toml`: project configuration.
-- `README.md`: this file.
-- `uv.lock`: lock file for `uv`. pins dependencies to exact versions.
