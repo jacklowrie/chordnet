@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 jobs:
-  compile:
+  build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,7 +42,7 @@ jobs:
         
       - name: Run tests
         run: uv run pytest
-        
+      
       - name: Build package
         run: uv build
 
