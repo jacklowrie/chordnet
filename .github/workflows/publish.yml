@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 jobs:
-  setup:
+  compile:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,12 +36,15 @@ jobs:
 
       - name: Install chordnet
         run: uv sync --locked --all-extras --dev
-
-  verify:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
+        
       - name: Run linter
         run: uv run ruff check --output-format=github .
+        
       - name: Run tests
         run: uv run pytest
+        
+      - name: Build package
+        run: uv build
+
+      - name: Publish package
+        run: uv publish --index testpypi
