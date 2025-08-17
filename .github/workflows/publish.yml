@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build-package:
-    uses: ./.github/workflows/reusable/pipeline.yml
+    uses: ./.github/workflows/pipeline.yml
     id: build_job
     with:
       os: ubuntu-latest
