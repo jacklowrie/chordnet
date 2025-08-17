@@ -5,35 +5,35 @@ name: Test ChordNet
 
 on:
   workflow_call:
-  inputs:
-    os:
-      description: 'Operating system to run on'
-      required: true
-      type: string
-    python-version:
-      description: 'Python version to use'
-      required: false
-      type: string
-    run-lint:
-      description: 'Whether to run linting'
-      required: false
-      type: boolean
-      default: true
-    run-typecheck:
-      description: 'Whether to run type checking'
-      required: false
-      type: boolean
-      default: true
-    run-test:
-      description: 'Whether to run tests'
-      required: false
-      type: boolean
-      default: true
-    run-build:
-      description: 'Whether to run build'
-      required: false
-      type: boolean
-      default: false
+    inputs:
+      os:
+        description: 'Operating system to run on'
+        required: true
+        type: string
+      python-version:
+        description: 'Python version to use'
+        required: false
+        type: string
+      run-lint:
+        description: 'Whether to run linting'
+        required: false
+        type: boolean
+        default: true
+      run-typecheck:
+        description: 'Whether to run type checking'
+        required: false
+        type: boolean
+        default: true
+      run-test:
+        description: 'Whether to run tests'
+        required: false
+        type: boolean
+        default: true
+      run-build:
+        description: 'Whether to run build'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   pipeline:
