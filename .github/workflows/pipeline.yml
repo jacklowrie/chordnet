@@ -41,7 +41,8 @@ jobs:
       
     steps:
     - uses: actions/checkout@v4
-    
+
+
     - id: py-version
       name: Resolve Python Version
       shell: bash
@@ -55,6 +56,9 @@ jobs:
           fi
           echo "py_version=$PY_VER" >> $GITHUB_OUTPUT
 
+
+
+    # setup
     - name: Set up Python ${{ steps.py-version.outputs.py_version }}
       uses: actions/setup-python@v3
       with:
@@ -64,26 +68,11 @@ jobs:
       uses: astral-sh/setup-uv@v6
       with:
         python-version: ${{ steps.py-version.outputs.py_version }}
+        enable-cache: true
         
-    - name: Cache uv packages on Linux/macOS
-      if: runner.os != 'Windows'
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/uv
-        key: uv-packages-${{ inputs.os }}-${{ steps.py-version.outputs.py_version }}-${{ hashFiles('uv.lock') }}
-        restore-keys: |
-           uv-packages-${{ inputs.os }}-${{ steps.py-version.outputs.py_version }}-
-    
-    - name: Cache uv packages on Windows
-      if: runner.os == 'Windows'
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.USERPROFILE }}\.cache\uv
-        key: uv-packages-${{ inputs.os }}-${{ steps.py-version.outputs.py_version }}-${{ hashFiles('uv.lock') }}
-        restore-keys: |
-           uv-packages-${{ inputs.os }}-${{ steps.py-version.outputs.py_version }}-
+          
 
-
+    # validate code. make sure it's linted/typechecked, and passing all tests as flagged.
     - name: Install chordnet dependencies
       run: uv sync --frozen --all-extras --dev
         
@@ -99,6 +88,9 @@ jobs:
       if: ${{ inputs.run-test }}
       run: uv run pytest 
 
+
+
+    # build distribution if flagged        
     - name: Run build
       if: ${{ inputs.run-build }}
       run: uv build
