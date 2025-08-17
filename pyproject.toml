@@ -1,11 +1,47 @@
 [project]
 name = "chordnet"
 version = "0.1.0"
+license = "MIT"
+license-files = ["LICENSE"]
 description = "Implementation of the chord peer-to-peer networking protocol, introduced by Stoica et al."
 readme = "README.md"
 authors = [
-    { name = "Jack Lowrie", email = "jacklowrie@me.com" }
+    { name = "Jack Lowrie" }
 ]
+classifiers = [
+    # How mature is this project? Common values are
+    #   1 - Planning
+    #   2 - Pre-Alpha
+    #   3 - Alpha
+    #   4 - Beta
+    #   5 - Production/Stable
+    #   7 - Inactive
+    "Development Status :: 1 - Planning",
+
+    # Indicate who your project is intended for
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Internet",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System",
+    "Topic :: System :: Distributed Computing",
+    "Topic :: System :: Networking",
+    "Topic :: Utilities",
+
+    # Specify the Python versions you support here.
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+
+    # Other meta
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Typing :: Typed",
+]
+
 requires-python = ">=3.11"
 dependencies = []
 
@@ -21,6 +57,7 @@ explicit = true
 
 [dependency-groups]
 dev = [
+    "mypy>=1.17.1",
     "pytest>=8.4.1",
     "ruff>=0.12.5",
 ]
