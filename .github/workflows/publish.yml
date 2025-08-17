@@ -17,38 +17,14 @@ permissions:
 
 jobs:
   build-package:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: ".python-version"
-      
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-        with:
-          version: "0.7.19"
-          enable-cache: true
-
-      - name: Install chordnet
-        run: uv sync --locked --all-extras --dev
-        
-      - name: Run linter
-        run: uv run ruff check --output-format=github .
-        
-      - name: Run tests
-        run: uv run pytest
-      
-      - name: Build package
-        run: uv build
-
-      - name: Upload distributions
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-dists
-          path: dist/
+    uses: ./.github/workflows/reusable/pipeline.yml
+    id: build_job
+    with:
+      os: ubuntu-latest
+      run-lint: true
+      run-typecheck: true
+      run-test: true
+      run-build: true
 
   pypi-publish:
     runs-on: ubuntu-latest
