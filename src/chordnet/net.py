@@ -21,14 +21,14 @@ class _Net:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.bind((self._ip, self._port))
         self.server_socket.listen(5)
-        
+
         # Start network listener in a separate thread
         self.network_thread = threading.Thread(
-            target=self._listen_for_connections, 
+            target=self._listen_for_connections,
             daemon=True
         )
         self.network_thread.start()
-    
+
 
 
     def stop(self):
@@ -62,10 +62,10 @@ class _Net:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 # Set a reasonable timeout (e.g., 5 seconds)
                 sock.settimeout(5)
-                
+
                 # Connect to the target node
                 sock.connect((dest_node.ip, dest_node.port))
-                
+
                 # Prepare the request
                 # Convert all args to strings and join with ':'
                 request_args = ':'.join(str(arg) for arg in args)
@@ -74,12 +74,12 @@ class _Net:
                     print ('[SENDING TRACE REQ]', request)
                 # Send the request
                 sock.send(request.encode())
-                
+
                 # Receive the response
                 response = sock.recv(1024).decode()
-                
+
                 return response
-        
+
         except socket.timeout:
             print("Request timed out", file=sys.stderr)
             return None
@@ -104,15 +104,15 @@ class _Net:
                 client_socket, address = self.server_socket.accept()
                 # Handle each connection in a separate thread
                 threading.Thread(
-                    target=self._handle_connection, 
-                    args=(client_socket,), 
+                    target=self._handle_connection,
+                    args=(client_socket,),
                     daemon=True
                 ).start()
             except Exception as e:
                 if self._running:
                     sys.stderr.write(f"Error accepting connection: {e}\n")
                     sys.stderr.flush()
-    
+
 
 
     def _handle_connection(self, client_socket):
@@ -128,7 +128,7 @@ class _Net:
 
             # Parse request
             method, *args = request.split(':')
-            
+
             if method == 'TRACE_SUCCESSOR':
                 print(f"[NET]Received request: {request}", file=sys.stderr)
 
@@ -145,5 +145,3 @@ class _Net:
             sys.stderr.flush()
         finally:
             client_socket.close()
-    
-    

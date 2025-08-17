@@ -28,7 +28,7 @@ class Address:
 
 
 
-    
+
     def _hash(self, key):
         """
         Generates a consistent hash for identifiers.
@@ -46,12 +46,11 @@ class Address:
     def __eq__(self, other):
         if not isinstance(other, Address):
             return False
-        return (self.ip == other.ip and 
-                self.port == other.port and 
+        return (self.ip == other.ip and
+                self.port == other.port and
                 self.key == other.key)
-    
+
 
 
     def __repr__(self):
         return f"{self.key}:{self.ip}:{self.port}"
-

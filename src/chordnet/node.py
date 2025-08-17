@@ -6,16 +6,16 @@ from .net import _Net
 
 class Node:
     """Implements a Chord distributed hash table node.
-    
+
     This is meant to run on a host and handle any chord-related
     traffic. Applications should make one instance of this class,
     then use the methods to manage/interact with other nodes on
     the chord ring.
 
-    Of particular note, this class is only responsible for making, 
-    managing, and locating nodes (and therefore locating the node 
-    that is responsible for a key). In a key-value pair, 
-    It does NOT handle the management of values at all: that is 
+    Of particular note, this class is only responsible for making,
+    managing, and locating nodes (and therefore locating the node
+    that is responsible for a key). In a key-value pair,
+    It does NOT handle the management of values at all: that is
     an application-level responsibility.
 
     Attributes:
@@ -35,16 +35,16 @@ class Node:
         """
 
         self.address = Address(ip, port)
-        
+
         # Network topology management
         self.predecessor = None
         self.finger_table = [None] * Address._M
         self._next = 0 # for fix_fingers (iterating through finger_table)
-        
+
         # Networking
         self._net = _Net(ip, port, self._process_request)
         self.is_running = False
-        
+
     def successor(self):
         """alias for self.finger_table[0]"""
         return self.finger_table[0]
@@ -59,7 +59,7 @@ class Node:
         self.finger_table[0] = self.address
         self.start()
         self.fix_fingers()
-    
+
 
 
     def join(self, known_ip, known_port):
@@ -71,28 +71,28 @@ class Node:
             known_port (int): Port number of the existing node.
         """
         self.predecessor = None
-        
+
         # Create an Address object for the known node
         known_node_address = Address(known_ip, known_port)
-        
+
         try:
             # Send a find_successor request to the known node for this node's key
             response = self._net.send_request(
-                known_node_address, 
-                'FIND_SUCCESSOR', 
+                known_node_address,
+                'FIND_SUCCESSOR',
                 self.address.key
             )
-            
+
             if response:
                 self.finger_table[0] = self._parse_address(response)
                 print(f"Node {self.address.key} joined the ring. Successor: {self.successor().key}", file=sys.stderr)
             else:
                 raise ValueError("Failed to find successor. Join failed")
-            
+
             self.start()
             self.fix_fingers()
-            
-            
+
+
         except Exception as e:
             print(f"Join failed: {e}")
             raise
@@ -111,7 +111,7 @@ class Node:
 
         start = self.address.key + gap
         #print(f"fixing finger {self._next}. gap is {gap}, start of interval is: {start}")
-        
+
         try:
             # Find the successor for this finger's start position
             responsible_node = self.find_successor(start)
@@ -180,10 +180,10 @@ class Node:
         # If id is between this node and its successor
         if self._is_key_in_range(id):
             return self.successor()
-        
+
         # Find closest preceding node in my routing table.
         closest_node = self.closest_preceding_finger(id)
-        
+
         # If closest preceding node is me, then I need to return my own successor
         if closest_node == self.address:
             return self.successor()
@@ -192,12 +192,12 @@ class Node:
         # then return what they send back
         try:
             response = self._net.send_request(
-                closest_node, 
-                'FIND_SUCCESSOR', 
+                closest_node,
+                'FIND_SUCCESSOR',
                 id
             )
             return self._parse_address(response)
-        
+
         except Exception as e:
             print(f"Find successor failed: {e}")
             # Fallback to local successor if network request fails
@@ -218,10 +218,10 @@ class Node:
         for finger in reversed(self.finger_table):
             if finger and self._is_between(self.address.key, id, finger.key):
                 return finger
-        
+
         # This is only possible if there are no finger_table entries
         return self.address
-    
+
 
 
     def check_predecessor(self):
@@ -236,14 +236,14 @@ class Node:
         try:
             # Try to send a simple request to the predecessor
             response = self._net.send_request(
-                self.predecessor, 
+                self.predecessor,
                 'PING'
             )
-            
+
             # If no response or invalid response, consider node failed
             if not response or response != 'ALIVE':
                 self.predecessor = None
-        
+
         except Exception:
             # Any network error means the predecessor is likely down
             self.predecessor = None
@@ -281,7 +281,7 @@ class Node:
             #print(f"Node {self.address} - Updated Successor: {self.successor()}, Predecessor: {self.predecessor}", file=sys.stderr)
 
         except Exception as e:
-            print(f"Stabilize failed: {e}", file=sys.stderr) 
+            print(f"Stabilize failed: {e}", file=sys.stderr)
 
 
     def notify(self, potential_successor):
@@ -301,8 +301,8 @@ class Node:
         try:
             # Send notification to potential successor
             response = self._net.send_request(
-                potential_successor, 
-                'NOTIFY', 
+                potential_successor,
+                'NOTIFY',
                 f"{self.address.key}:{self.address.ip}:{self.address.port}"
             )
             if response == "OK" or response == "IGNORED":
@@ -345,15 +345,15 @@ class Node:
         """
         if not self.successor(): # no successor case
             return True
-        
+
         successor_key = self.successor().key
-        
+
         if self.address.key < successor_key:
             # Normal case: key is strictly between node and successor
             return self.address.key < key < successor_key
         else:  # Wrap around case
             return key > self.address.key or key < successor_key
-    
+
 
 
     def _is_between(self, start, end, key):
@@ -372,7 +372,7 @@ class Node:
             return start < key < end
         else:  # Wrap around case
             return key > start or key < end
-    
+
 
 
     def _be_notified(self, notifying_node):
@@ -386,7 +386,7 @@ class Node:
             bool: True if the node was accepted as a predecessor, False otherwise.
         """
         # Update predecessor if necessary
-        if (not self.predecessor or 
+        if (not self.predecessor or
             self._is_between(self.predecessor.key, self.address.key, notifying_node.key)):
             self.predecessor = notifying_node
             return True
@@ -406,10 +406,10 @@ class Node:
         if self._is_key_in_range(id):
             return self.successor(), curr_hops
             # return curr_hops
-        
+
         # Find closest preceding node in my routing table.
         closest_node = self.closest_preceding_finger(id)
-        
+
         # If closest preceding node is me, then I need to return my own successor
         if closest_node == self.address:
             return self.successor(), curr_hops
@@ -418,8 +418,8 @@ class Node:
         # then return what they send back
         try:
             response = self._net.send_request(
-                closest_node, 
-                'TRACE_SUCCESSOR', 
+                closest_node,
+                'TRACE_SUCCESSOR',
                 id,
                 curr_hops
             )
@@ -437,7 +437,7 @@ class Node:
             return address, int(hops)+1
 
             # return self._parse_address(response), hops
-        
+
         except Exception as e:
             print(f"trace successor failed: {e}")
             # Fallback to local successor if network request fails
@@ -464,7 +464,7 @@ class Node:
                 id, hops = int(args[0]), int(args[1])
                 print ("[NODE] Current ID ", id, "Current hops ", hops)
                 successor, hops = self.trace_successor(id, hops)
-                
+
                 print ("SUCCESSSOR NODE :", successor, "HOPS :", hops)
                 returnString = f"{successor}:{hops}"
                 return returnString
@@ -482,7 +482,7 @@ class Node:
 
             except ValueError:
                 return "INVALID_NODE"
-        else: 
+        else:
             return "INVALID_METHOD"
 
 
@@ -521,5 +521,3 @@ class Node:
         """
 
         return f"ChordNode(key={self.address.key})"
-
-

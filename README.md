@@ -9,7 +9,7 @@ Fall 2024.
 `uv add chordnet`
 
 ## Usage
-to stay consistent with the language from the original paper, we recommend 
+to stay consistent with the language from the original paper, we recommend
 importing this package as `ring`:
 ```python
 from chordnet import Node as ring
@@ -24,4 +24,3 @@ Examples follow this practice.
 - [ ] make sure nodes can run on a single computer (same IP, diff't ports)
 - [ ] add robust testing
 - [ ] refactor to use asyncio
-

@@ -38,7 +38,7 @@ on:
 jobs:
   pipeline:
     runs-on: ${{ inputs.os }}
-      
+
     steps:
     - uses: actions/checkout@v4
 
@@ -63,19 +63,19 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ steps.py-version.outputs.py_version }}
-        
+
     - name: Install uv
       uses: astral-sh/setup-uv@v6
       with:
         python-version: ${{ steps.py-version.outputs.py_version }}
         enable-cache: true
-        
-          
+
+
 
     # validate code. make sure it's linted/typechecked, and passing all tests as flagged.
     - name: Install chordnet dependencies
       run: uv sync --frozen --all-extras --dev
-        
+
     - name: Run linter
       if: ${{ inputs.run-lint }}
       run: uv run ruff check --output-format=github .
@@ -86,11 +86,11 @@ jobs:
 
     - name: Run tests
       if: ${{ inputs.run-test }}
-      run: uv run pytest 
+      run: uv run pytest
 
 
 
-    # build distribution if flagged        
+    # build distribution if flagged
     - name: Run build
       if: ${{ inputs.run-build }}
       run: uv build
