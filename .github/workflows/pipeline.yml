@@ -44,6 +44,7 @@ jobs:
     
     - id: py-version
       name: Resolve Python Version
+      shell: bash
       run: |
           if [ -z "${{ steps.py-version.outputs.py_version }}" ]; then
             echo "No python-version input provided, reading from .python-version file"
