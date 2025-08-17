@@ -16,3 +16,4 @@ repos:
       language: system
       types: [python]
       args: ["run", "ruff", "check", "--fix"]
+      always_run: true
