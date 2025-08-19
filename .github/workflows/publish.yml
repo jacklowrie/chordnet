@@ -18,7 +18,6 @@ permissions:
 jobs:
   build-package:
     uses: ./.github/workflows/pipeline.yml
-    id: build_job
     with:
       os: ubuntu-latest
       run-lint: true
@@ -49,7 +48,7 @@ jobs:
           name: release-dists
           path: dist/
 
-      - name: Publish package distributions to TestPyPI
+      - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           verbose: true
