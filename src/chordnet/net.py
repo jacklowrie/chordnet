@@ -10,6 +10,8 @@ class _Net:
         self._request_handler = request_handler
         self._running = False
         self._network_thread = None
+        self.server_socket = None
+        self.network_thread = None
 
     def start(self):
         """
