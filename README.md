@@ -20,7 +20,7 @@ Examples follow this practice.
 
 ## High level roadmap
 - [x] port over code from course project
-- [ ] set up repo/project workflows, including using `uv`
+- [x] set up repo/project workflows, including using `uv`
 - [ ] make sure nodes can run on a single computer (same IP, diff't ports)
-- [ ] add robust testing
+- [x] add robust testing
 - [ ] refactor to use asyncio
