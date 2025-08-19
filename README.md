@@ -21,6 +21,8 @@ Examples follow this practice.
 ## High level roadmap
 - [x] port over code from course project
 - [x] set up repo/project workflows, including using `uv`
-- [ ] make sure nodes can run on a single computer (same IP, diff't ports)
+- [ ] Add type annotations
 - [x] add robust testing
+- [ ] make sure old mininet setup/raspi setups still work
+- [ ] make sure nodes can run on a single computer (same IP, diff't ports)
 - [ ] refactor to use asyncio
