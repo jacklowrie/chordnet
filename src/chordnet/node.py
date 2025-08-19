@@ -264,6 +264,8 @@ class Node:
         if not self.successor():
             return
 
+        x = None
+
         try:
             # Get the predecessor of the current successor
             #print(f"stabilize: checking successor {self.successor().key} for predecessor", file=sys.stderr)
@@ -277,11 +279,12 @@ class Node:
                 #print(f"stabilize: updated successor to {self.successor().key}", file=sys.stderr)
             # otherwise, we just notify them that we exist. This is usually for the first joiner to a ring.
 
-            self.notify(self.successor())
             #print(f"Node {self.address} - Updated Successor: {self.successor()}, Predecessor: {self.predecessor}", file=sys.stderr)
 
         except Exception as e:
             print(f"Stabilize failed: {e}", file=sys.stderr)
+        finally:
+            self.notify(self.successor())
 
 
     def notify(self, potential_successor):
@@ -311,6 +314,7 @@ class Node:
                 return False
         except Exception as e:
             print(f"Notify failed: {e}", file=sys.stderr)
+            return False
 
 
     def start(self):
@@ -368,6 +372,8 @@ class Node:
         Returns:
             bool: True if the node is between start and end, False otherwise.
         """
+        if start == end: # this shouldn't happen
+            return False
         if start < end:
             return start < key < end
         else:  # Wrap around case
@@ -477,6 +483,9 @@ class Node:
         elif method == 'NOTIFY':
             # Parse the notifying node's details
             try:
+                if len(args) < 3:
+                    return "INVALID_NODE"
+
                 notifier = self._parse_address(':'.join([args[0], args[1], args[2]]))
                 return "OK" if self._be_notified(notifier) else "IGNORED"
 
