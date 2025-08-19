@@ -1,6 +1,7 @@
 # address.py
 
 import hashlib
+from typing import Any
 
 class Address:
     """
@@ -17,11 +18,11 @@ class Address:
     Provides methods for equality comparison and string representation.
     """
     __slots__= ('key', 'ip', 'port')
-    _M = 16
-    _SPACE = 2 ** _M
+    _M: int = 16
+    _SPACE: int = 2 ** _M
 
 
-    def __init__(self, ip, port):
+    def __init__(self, ip: str, port: int) -> None:
         self.key = self._hash(f"{ip}:{port}")
         self.ip = ip
         self.port = port
@@ -29,7 +30,7 @@ class Address:
 
 
 
-    def _hash(self, key):
+    def _hash(self, key: str) -> int:
         """
         Generates a consistent hash for identifiers.
 
@@ -43,7 +44,7 @@ class Address:
 
 
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Address):
             return False
         return (self.ip == other.ip and
@@ -52,5 +53,5 @@ class Address:
 
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.key}:{self.ip}:{self.port}"
