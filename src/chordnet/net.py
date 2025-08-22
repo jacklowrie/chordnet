@@ -1,10 +1,22 @@
 import socket
 import sys
 import threading
+from typing import Callable, Any
+from address import Address
+
+callback = Callable[[str, list[str]], str| Address | None]
 
 class _Net:
 
-    def __init__(self, ip, port, request_handler):
+    _ip: str
+    _port: int
+    _request_handler: callback
+    _running: bool
+    _network_thread: threading.Thread | None
+    server_socket: socket.socket | None
+    network_thread: threading.Thread | None
+
+    def __init__(self, ip: str, port: int, request_handler: callback) -> None:
         self._ip = ip
         self._port = port
         self._request_handler = request_handler
@@ -13,7 +25,7 @@ class _Net:
         self.server_socket = None
         self.network_thread = None
 
-    def start(self):
+    def start(self) -> None:
         """
         Starts the Chord node's network listener.
 
@@ -33,7 +45,7 @@ class _Net:
 
 
 
-    def stop(self):
+    def stop(self) -> None:
         """
         Gracefully stops the Chord node's network listener.
 
@@ -47,7 +59,7 @@ class _Net:
 
 
 
-    def send_request(self, dest_node, method, *args):
+    def send_request(self, dest_node: Address, method: str, *args: Any) -> None:
         """
         Sends a network request to a specific node.
 
@@ -95,7 +107,7 @@ class _Net:
 
 
 
-    def _listen_for_connections(self):
+    def _listen_for_connections(self) -> None:
         """
         Continuously listens for incoming network connections.
 
@@ -117,7 +129,7 @@ class _Net:
 
 
 
-    def _handle_connection(self, client_socket):
+    def _handle_connection(self, client_socket: socket.Socket) -> None:
         """
         Processes an individual network connection.
 
