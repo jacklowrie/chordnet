@@ -1,10 +1,24 @@
+"""net.py: Class for handling networking operations for nodes."""
 import socket
 import sys
 import threading
+from typing import Callable, Tuple
+
+from .address import Address
+
+callback = Callable[[str, list[str]], str| Address | None]
 
 class _Net:
 
-    def __init__(self, ip, port, request_handler):
+    _ip: str
+    _port: int
+    _request_handler: callback
+    _running: bool
+    _network_thread: threading.Thread | None
+    server_socket: socket.socket | None
+    network_thread: threading.Thread | None
+
+    def __init__(self, ip: str, port: int, request_handler: callback) -> None:
         self._ip = ip
         self._port = port
         self._request_handler = request_handler
@@ -13,9 +27,8 @@ class _Net:
         self.server_socket = None
         self.network_thread = None
 
-    def start(self):
-        """
-        Starts the Chord node's network listener.
+    def start(self) -> None:
+        """Starts the Chord node's network listener.
 
         Begins accepting incoming network connections in a separate thread.
         """
@@ -33,9 +46,8 @@ class _Net:
 
 
 
-    def stop(self):
-        """
-        Gracefully stops the Chord node's network listener.
+    def stop(self) -> None:
+        """Gracefully stops the Chord node's network listener.
 
         Closes the server socket and waits for the network thread to terminate.
         """
@@ -47,9 +59,10 @@ class _Net:
 
 
 
-    def send_request(self, dest_node, method, *args):
-        """
-        Sends a network request to a specific node.
+    def send_request(
+        self, dest_node: Address, method: str, *args: object
+    ) -> str | None:
+        """Sends a network request to a specific node.
 
         Args:
             dest_node (Address): The network address to send the request to
@@ -78,7 +91,7 @@ class _Net:
                 sock.send(request.encode())
 
                 # Receive the response
-                response = sock.recv(1024).decode()
+                response: str = sock.recv(1024).decode()
 
                 return response
 
@@ -95,15 +108,19 @@ class _Net:
 
 
 
-    def _listen_for_connections(self):
-        """
-        Continuously listens for incoming network connections.
+    def _listen_for_connections(self) -> None:
+        """Continuously listens for incoming network connections.
 
-        Accepts client connections and spawns a thread to handle each connection.
+        Accepts client connections and spawns a thread to handle
+        each connection.
         """
         while self._running:
             try:
-                client_socket, address = self.server_socket.accept()
+                client_socket: socket.socket | None = None
+                address: Tuple[str, int] | None = None
+
+                if self.server_socket:
+                    client_socket, address = self.server_socket.accept()
                 # Handle each connection in a separate thread
                 threading.Thread(
                     target=self._handle_connection,
@@ -117,16 +134,15 @@ class _Net:
 
 
 
-    def _handle_connection(self, client_socket):
-        """
-        Processes an individual network connection.
+    def _handle_connection(self, client_socket: socket.socket) -> None:
+        """Processes an individual network connection.
 
         Args:
             client_socket (socket): The socket connection to handle.
         """
         try:
             # Receive request
-            request = client_socket.recv(1024).decode()
+            request: str = client_socket.recv(1024).decode()
 
             # Parse request
             method, *args = request.split(':')

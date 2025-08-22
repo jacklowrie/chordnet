@@ -80,9 +80,9 @@ jobs:
       if: ${{ inputs.run-lint }}
       run: uv run ruff check --output-format=github .
 
-      # - name: Run typechecker
-      #   if: ${{ inputs.run-typecheck }}
-      #   run: uv run mypy .
+    - name: Run typechecker
+      if: ${{ inputs.run-typecheck }}
+      run: uv run mypy
 
     - name: Run tests
       if: ${{ inputs.run-test }}

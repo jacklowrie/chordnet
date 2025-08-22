@@ -25,3 +25,19 @@ repos:
         types: [python]
         args: ["run", "ruff", "check", "--fix"]
         always_run: true
+
+    -   id: mypy
+        name: MyPy Type-Checker
+        entry: uv
+        language: system
+        types: [python]
+        args: ["run", "mypy"]
+        always_run: true
+
+    -   id: pytest
+        name: PyTest
+        entry: uv
+        language: system
+        types: [python]
+        args: ["run", "pytest"]
+        always_run: true
