@@ -1,9 +1,10 @@
 # node.py
 import sys
-
+from typing import Tuple, Callable
 from .address import Address
 from .net import _Net
 
+callback_t = Callable[[str, list[str]], str | Address | None]
 class Node:
     """Implements a Chord distributed hash table node.
 
@@ -25,7 +26,14 @@ class Node:
         finger_table (list): Routing table for efficient lookup.
     """
 
-    def __init__(self, ip, port):
+    address: Address
+    predecesor: Address | None
+    finger_table: list[Address | None]
+    _next: int
+    _net: _Net
+    is_running: bool
+
+    def __init__(self, ip: str, port: int) -> None:
         """
         Initializes a new Chord node.
 
@@ -45,11 +53,11 @@ class Node:
         self._net = _Net(ip, port, self._process_request)
         self.is_running = False
 
-    def successor(self):
+    def successor(self) -> Address | None:
         """alias for self.finger_table[0]"""
         return self.finger_table[0]
 
-    def create(self):
+    def create(self) -> None:
         """
         Creates a new Chord ring with this node as the initial member.
 
@@ -62,7 +70,7 @@ class Node:
 
 
 
-    def join(self, known_ip, known_port):
+    def join(self, known_ip: str, known_port: int) -> None:
         """
         Joins an existing Chord ring through a known node's IP and port.
 
@@ -77,7 +85,7 @@ class Node:
 
         try:
             # Send a find_successor request to the known node for this node's key
-            response = self._net.send_request(
+            response: str | None = self._net.send_request(
                 known_node_address,
                 'FIND_SUCCESSOR',
                 self.address.key
@@ -99,7 +107,7 @@ class Node:
 
 
 
-    def fix_fingers(self):
+    def fix_fingers(self) -> None:
         """
         Incrementally updates one entry in the node's finger table.
         """
@@ -157,7 +165,7 @@ class Node:
             self._fix_fingers_timer = None
         self.is_running = False
     '''
-    def log_finger_table(self):
+    def log_finger_table(self) -> None:
         """
         Logs the entire finger table to the log file.
         """
@@ -167,7 +175,7 @@ class Node:
 
         print(message, file=sys.stderr)
 
-    def find_successor(self, id):
+    def find_successor(self, id: int) -> Address:
         """
         Finds the successor node for a given identifier.
 
@@ -204,7 +212,7 @@ class Node:
             return self.successor()
 
 
-    def closest_preceding_finger(self, id):
+    def closest_preceding_finger(self, id: int) -> Address:
         """
         Finds the closest preceding node for a given id in this node's fingertable.
 
@@ -224,7 +232,7 @@ class Node:
 
 
 
-    def check_predecessor(self):
+    def check_predecessor(self) -> None:
         """
         Checks if the predecessor node has failed.
 
@@ -250,7 +258,7 @@ class Node:
 
 
 
-    def stabilize(self):
+    def stabilize(self) -> None:
         """
         Periodically verifies and updates the node's successor.
 
@@ -287,7 +295,7 @@ class Node:
             self.notify(self.successor())
 
 
-    def notify(self, potential_successor):
+    def notify(self, potential_successor: Address | None)-> bool:
         """
         Notifies a node about a potential predecessor.
 
@@ -317,7 +325,7 @@ class Node:
             return False
 
 
-    def start(self):
+    def start(self) -> None:
         """
         Starts the Chord node's network listener.
 
@@ -327,7 +335,7 @@ class Node:
 
 
 
-    def stop(self):
+    def stop(self) -> None:
         """
         Gracefully stops the Chord node's network listener.
 
@@ -337,7 +345,7 @@ class Node:
 
 
 
-    def _is_key_in_range(self, key):
+    def _is_key_in_range(self, key: int) -> bool:
         """
         Checks if a key is between this node and its successor.
 
@@ -360,7 +368,7 @@ class Node:
 
 
 
-    def _is_between(self, start, end, key):
+    def _is_between(self, start:int, end:int, key:int) -> bool:
         """
         Checks if a node is between two identifiers in the Chord ring.
 
@@ -381,7 +389,7 @@ class Node:
 
 
 
-    def _be_notified(self, notifying_node):
+    def _be_notified(self, notifying_node: Address) -> bool:
         """
         Handles a notification from another node about potentially being its predecessor.
 
@@ -398,7 +406,7 @@ class Node:
             return True
         return False
 
-    def trace_successor(self, id, curr_hops):
+    def trace_successor(self, id: int, curr_hops: int) -> Tuple[str, int] | Address:
         """
         Finds the successor node for a given identifier.
 
@@ -450,7 +458,7 @@ class Node:
             return self.successor()
 
 
-    def _process_request(self, method, args):
+    def _process_request(self, method: str, args: list[str]) -> str | Address | None:
         """
         Routes incoming requests to appropriate methods.
 
@@ -495,7 +503,7 @@ class Node:
             return "INVALID_METHOD"
 
 
-    def _parse_address(self, response):
+    def _parse_address(self, response: str | None) -> Address | None:
         """
         Parses a network response into an Address object. Only addresses are expected.
 
@@ -521,7 +529,7 @@ class Node:
 
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Provides a string representation of the Chord node.
 
