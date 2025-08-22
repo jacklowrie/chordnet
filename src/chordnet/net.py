@@ -4,7 +4,7 @@ import sys
 import threading
 from typing import Callable, Tuple
 
-from address import Address
+from .address import Address
 
 callback = Callable[[str, list[str]], str| Address | None]
 
@@ -132,7 +132,7 @@ class _Net:
 
 
 
-    def _handle_connection(self, client_socket: socket.Socket) -> None:
+    def _handle_connection(self, client_socket: socket.socket) -> None:
         """Processes an individual network connection.
 
         Args:
