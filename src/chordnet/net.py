@@ -1,7 +1,7 @@
 import socket
 import sys
 import threading
-from typing import Callable, Any
+from typing import Callable, Any, Tuple
 from address import Address
 
 callback = Callable[[str, list[str]], str| Address | None]
@@ -90,7 +90,7 @@ class _Net:
                 sock.send(request.encode())
 
                 # Receive the response
-                response = sock.recv(1024).decode()
+                response: bytes = sock.recv(1024).decode()
 
                 return response
 
@@ -115,6 +115,8 @@ class _Net:
         """
         while self._running:
             try:
+                client_socket: socket.socket
+                address: Tuple[str, int]
                 client_socket, address = self.server_socket.accept()
                 # Handle each connection in a separate thread
                 threading.Thread(
@@ -138,7 +140,7 @@ class _Net:
         """
         try:
             # Receive request
-            request = client_socket.recv(1024).decode()
+            request: str = client_socket.recv(1024).decode()
 
             # Parse request
             method, *args = request.split(':')
