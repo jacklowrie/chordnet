@@ -73,3 +73,22 @@ pythonpath = [
 testpaths = [
     "tests",
 ]
+
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "ANN", # annotations :)
+    "D", # code documentation :)
+]
+ignore = ["F403", "F405"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

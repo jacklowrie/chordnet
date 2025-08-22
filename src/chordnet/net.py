@@ -1,7 +1,9 @@
+"""net.py: Class for handling networking operations for nodes."""
 import socket
 import sys
 import threading
-from typing import Callable, Any, Tuple
+from typing import Callable, Tuple
+
 from address import Address
 
 callback = Callable[[str, list[str]], str| Address | None]
@@ -26,8 +28,7 @@ class _Net:
         self.network_thread = None
 
     def start(self) -> None:
-        """
-        Starts the Chord node's network listener.
+        """Starts the Chord node's network listener.
 
         Begins accepting incoming network connections in a separate thread.
         """
@@ -46,8 +47,7 @@ class _Net:
 
 
     def stop(self) -> None:
-        """
-        Gracefully stops the Chord node's network listener.
+        """Gracefully stops the Chord node's network listener.
 
         Closes the server socket and waits for the network thread to terminate.
         """
@@ -59,9 +59,10 @@ class _Net:
 
 
 
-    def send_request(self, dest_node: Address, method: str, *args: Any) -> None:
-        """
-        Sends a network request to a specific node.
+    def send_request(
+        self, dest_node: Address, method: str, *args: object
+                     ) -> None:
+        """Sends a network request to a specific node.
 
         Args:
             dest_node (Address): The network address to send the request to
@@ -108,10 +109,10 @@ class _Net:
 
 
     def _listen_for_connections(self) -> None:
-        """
-        Continuously listens for incoming network connections.
+        """Continuously listens for incoming network connections.
 
-        Accepts client connections and spawns a thread to handle each connection.
+        Accepts client connections and spawns a thread to handle
+        each connection.
         """
         while self._running:
             try:
@@ -132,8 +133,7 @@ class _Net:
 
 
     def _handle_connection(self, client_socket: socket.Socket) -> None:
-        """
-        Processes an individual network connection.
+        """Processes an individual network connection.
 
         Args:
             client_socket (socket): The socket connection to handle.

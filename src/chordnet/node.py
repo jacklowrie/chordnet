@@ -1,6 +1,7 @@
-# node.py
+"""node.py: Represents a node on a ring."""
 import sys
-from typing import Tuple, Callable
+from typing import Callable, Tuple
+
 from .address import Address
 from .net import _Net
 
@@ -34,14 +35,12 @@ class Node:
     is_running: bool
 
     def __init__(self, ip: str, port: int) -> None:
-        """
-        Initializes a new Chord node.
+        """Initializes a new Chord node.
 
         Args:
             ip (str): IP address for the node.
             port (int): Port number to listen on.
         """
-
         self.address = Address(ip, port)
 
         # Network topology management
@@ -54,14 +53,14 @@ class Node:
         self.is_running = False
 
     def successor(self) -> Address | None:
-        """alias for self.finger_table[0]"""
+        """Alias for self.finger_table[0]."""
         return self.finger_table[0]
 
     def create(self) -> None:
-        """
-        Creates a new Chord ring with this node as the initial member.
+        """Creates a new Chord ring with this node as the initial member.
 
-        The node sets itself as its own successor and initializes the finger table.
+        The node sets itself as its own successor and initializes the
+        finger table.
         """
         self.predecessor = None
         self.finger_table[0] = self.address
@@ -71,8 +70,7 @@ class Node:
 
 
     def join(self, known_ip: str, known_port: int) -> None:
-        """
-        Joins an existing Chord ring through a known node's IP and port.
+        """Joins an existing Chord ring through a known node's IP and port.
 
         Args:
             known_ip (str): IP address of an existing node in the Chord ring.
@@ -84,7 +82,8 @@ class Node:
         known_node_address = Address(known_ip, known_port)
 
         try:
-            # Send a find_successor request to the known node for this node's key
+            # Send a find_successor request to the known node for
+            #this node's key
             response: str | None = self._net.send_request(
                 known_node_address,
                 'FIND_SUCCESSOR',
@@ -93,7 +92,9 @@ class Node:
 
             if response:
                 self.finger_table[0] = self._parse_address(response)
-                print(f"Node {self.address.key} joined the ring. Successor: {self.successor().key}", file=sys.stderr)
+                msg = f"Node {self.address.key} joined the ring. " \
+                        "Successor: {self.successor().key}"
+                print(msg, file=sys.stderr)
             else:
                 raise ValueError("Failed to find successor. Join failed")
 
@@ -108,9 +109,7 @@ class Node:
 
 
     def fix_fingers(self) -> None:
-        """
-        Incrementally updates one entry in the node's finger table.
-        """
+        """Incrementally updates one entry in the node's finger table."""
         if not self.successor():  # Ensure there's a valid successor
             return
 
@@ -118,7 +117,8 @@ class Node:
         gap = (2 ** self._next) % (2 ** Address._M)
 
         start = self.address.key + gap
-        #print(f"fixing finger {self._next}. gap is {gap}, start of interval is: {start}")
+        #print(f"fixing finger {self._next}. gap is {gap}, " \
+        #"start of interval is: {start}")
 
         try:
             # Find the successor for this finger's start position
@@ -139,7 +139,8 @@ class Node:
         """
         self.fix_fingers()
         # Schedule the next execution
-        self._fix_fingers_timer = threading.Timer(interval, self._run_fix_fingers, args=[interval])
+        self._fix_fingers_timer = threading.Timer(
+                        interval, self._run_fix_fingers, args=[interval])
         self._fix_fingers_timer.start()
 
     def start_periodic_tasks(self, interval=1.0):
@@ -166,9 +167,7 @@ class Node:
         self.is_running = False
     '''
     def log_finger_table(self) -> None:
-        """
-        Logs the entire finger table to the log file.
-        """
+        """Logs the entire finger table to the log file."""
         message = "Current Finger Table:\n"
         for i, finger in enumerate(self.finger_table):
             message += f"  Finger[{i}] -> {finger}\n"
@@ -176,14 +175,13 @@ class Node:
         print(message, file=sys.stderr)
 
     def find_successor(self, id: int) -> Address:
-        """
-        Finds the successor node for a given identifier.
+        """Finds the successor node for a given identifier.
 
         Args:
-            id (int): Identifier to find the successor for.
+            id: Identifier to find the successor for.
 
         Returns:
-            Address: The address of the node responsible for the given identifier.
+            The address of the node responsible for the given identifier.
         """
         # If id is between this node and its successor
         if self._is_key_in_range(id):
@@ -192,7 +190,8 @@ class Node:
         # Find closest preceding node in my routing table.
         closest_node = self.closest_preceding_finger(id)
 
-        # If closest preceding node is me, then I need to return my own successor
+        # If closest preceding node is me,
+        # then I need to return my own successor
         if closest_node == self.address:
             return self.successor()
 
@@ -213,11 +212,11 @@ class Node:
 
 
     def closest_preceding_finger(self, id: int) -> Address:
-        """
-        Finds the closest preceding node for a given id in this node's fingertable.
+        """Finds the closest known preceding node for a given id.
 
         Args:
-            id (int): Identifier to find the closest preceding node for (the key).
+            id (int): Identifier to find the closest preceding node
+                      for (the key).
 
         Returns:
             Address: The address of closest preceding node in the finger table.
@@ -233,8 +232,7 @@ class Node:
 
 
     def check_predecessor(self) -> None:
-        """
-        Checks if the predecessor node has failed.
+        """Checks if the predecessor node has failed.
 
         Sets predecessor to None if unresponsive.
         """
@@ -259,8 +257,7 @@ class Node:
 
 
     def stabilize(self) -> None:
-        """
-        Periodically verifies and updates the node's successor.
+        """Periodically verifies and updates the node's successor.
 
         This method ensures the correctness of the Chord ring topology.
         """
@@ -276,18 +273,28 @@ class Node:
 
         try:
             # Get the predecessor of the current successor
-            #print(f"stabilize: checking successor {self.successor().key} for predecessor", file=sys.stderr)
-            x_response = self._net.send_request(self.successor(), 'GET_PREDECESSOR')
+            #print(f"stabilize: checking successor {self.successor().key}" \
+            #for predecessor", file=sys.stderr)
+            x_response = self._net.send_request(
+                self.successor(), 'GET_PREDECESSOR')
 
-            #print(f"stabilize: predecessor found: {x_response}", file=sys.stderr)
+            #print(f"stabilize: predecessor found: {x_response}",
+            #file=sys.stderr)
             x = self._parse_address(x_response)
 
-            if x and self._is_between(self.address.key, self.successor().key, x.key):
+            if x and self._is_between(
+                    self.address.key, self.successor().key, x.key
+            ):
                 self.finger_table[0] = x
-                #print(f"stabilize: updated successor to {self.successor().key}", file=sys.stderr)
-            # otherwise, we just notify them that we exist. This is usually for the first joiner to a ring.
+                #print(
+                #f"stabilize: updated successor to {self.successor().key}",
+                #file=sys.stderr)
+            # otherwise, we just notify them that we exist.
+            # This is usually for the first joiner to a ring.
 
-            #print(f"Node {self.address} - Updated Successor: {self.successor()}, Predecessor: {self.predecessor}", file=sys.stderr)
+            #print(f"Node {self.address} - Updated Successor:" \
+            #"{self.successor()}, Predecessor: {self.predecessor}",
+            #file=sys.stderr)
 
         except Exception as e:
             print(f"Stabilize failed: {e}", file=sys.stderr)
@@ -296,15 +303,14 @@ class Node:
 
 
     def notify(self, potential_successor: Address | None)-> bool:
-        """
-        Notifies a node about a potential predecessor.
+        """Notifies a node about a potential predecessor.
 
         Args:
-            potential_successor (Address): Node that might be the successor.
+            potential_successor: Node that might be the successor.
 
         Returns:
-            bool: True if the notification is received (regardless of whether the
-                  update occurred), False otherwise
+            True if the notification is received (regardless of whether
+            the update occurred), False otherwise
         """
         if potential_successor is None:
             return False
@@ -326,8 +332,7 @@ class Node:
 
 
     def start(self) -> None:
-        """
-        Starts the Chord node's network listener.
+        """Starts the Chord node's network listener.
 
         Begins accepting incoming network connections in a separate thread.
         """
@@ -336,8 +341,7 @@ class Node:
 
 
     def stop(self) -> None:
-        """
-        Gracefully stops the Chord node's network listener.
+        """Gracefully stops the Chord node's network listener.
 
         Closes the server socket and waits for the network thread to terminate.
         """
@@ -346,8 +350,7 @@ class Node:
 
 
     def _is_key_in_range(self, key: int) -> bool:
-        """
-        Checks if a key is between this node and its successor.
+        """Checks if a key is between this node and its successor.
 
         Args:
             key (int): Identifier to check.
@@ -369,8 +372,7 @@ class Node:
 
 
     def _is_between(self, start:int, end:int, key:int) -> bool:
-        """
-        Checks if a node is between two identifiers in the Chord ring.
+        """Checks if a node is between two identifiers in the Chord ring.
 
         Args:
             start (int): Starting identifier.
@@ -390,31 +392,36 @@ class Node:
 
 
     def _be_notified(self, notifying_node: Address) -> bool:
-        """
-        Handles a notification from another node about potentially being its predecessor.
+        """Handles a notification from another node.
+
+        The notification is about potentially being its predecessor.
 
         Args:
-            notifying_node (Address): Node that is notifying this node.
+            notifying_node: Node that is notifying this node.
 
         Returns:
-            bool: True if the node was accepted as a predecessor, False otherwise.
+            True if the node was accepted as a predecessor, False otherwise.
         """
         # Update predecessor if necessary
         if (not self.predecessor or
-            self._is_between(self.predecessor.key, self.address.key, notifying_node.key)):
+            self._is_between(
+                self.predecessor.key, self.address.key, notifying_node.key)
+        ):
             self.predecessor = notifying_node
             return True
         return False
 
-    def trace_successor(self, id: int, curr_hops: int) -> Tuple[str, int] | Address:
-        """
-        Finds the successor node for a given identifier.
+    def trace_successor(
+        self, id: int, curr_hops: int
+    ) -> Tuple[str, int] | Address:
+        """Finds the successor node for a given identifier.
 
         Args:
-            id (int): Identifier to find the successor for.
+            id: Identifier to find the successor for.
+            curr_hops: number of hops taken so far.
 
         Returns:
-            Address: The address of the node responsible for the given identifier.
+            The address of the node responsible for the given identifier.
         """
         # If id is between this node and its successor
         if self._is_key_in_range(id):
@@ -424,7 +431,8 @@ class Node:
         # Find closest preceding node in my routing table.
         closest_node = self.closest_preceding_finger(id)
 
-        # If closest preceding node is me, then I need to return my own successor
+        # If closest preceding node is me, then I need to return
+        # my own successor
         if closest_node == self.address:
             return self.successor(), curr_hops
 
@@ -437,7 +445,7 @@ class Node:
                 id,
                 curr_hops
             )
-            print(f"Raw response: {response}", file=sys.stderr)  # Debugging line
+            print(f"Raw response: {response}", file=sys.stderr) # Debugging line
             parts = response.split(":")
             if len(parts) != 4:
                 raise ValueError(f"Invalid response format: {response}")
@@ -458,9 +466,10 @@ class Node:
             return self.successor()
 
 
-    def _process_request(self, method: str, args: list[str]) -> str | Address | None:
-        """
-        Routes incoming requests to appropriate methods.
+    def _process_request(
+        self, method: str, args: list[str]
+    ) -> str | Address | None:
+        """Routes incoming requests to appropriate methods.
 
         Args:
             method (str): The method to be called.
@@ -494,7 +503,9 @@ class Node:
                 if len(args) < 3:
                     return "INVALID_NODE"
 
-                notifier = self._parse_address(':'.join([args[0], args[1], args[2]]))
+                notifier = self._parse_address(':'.join(
+                    [args[0], args[1], args[2]])
+                )
                 return "OK" if self._be_notified(notifier) else "IGNORED"
 
             except ValueError:
@@ -504,8 +515,9 @@ class Node:
 
 
     def _parse_address(self, response: str | None) -> Address | None:
-        """
-        Parses a network response into an Address object. Only addresses are expected.
+        """Parses a network response into an Address object.
+
+        Only addresses are expected.
 
         Args:
             response (str): Serialized node address in "key:ip:port" format.
@@ -530,11 +542,9 @@ class Node:
 
 
     def __repr__(self) -> str:
-        """
-        Provides a string representation of the Chord node.
+        """Provides a string representation of the Chord node.
 
         Returns:
             str: A descriptive string of the node's key properties.
         """
-
         return f"ChordNode(key={self.address.key})"
