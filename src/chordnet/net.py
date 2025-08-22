@@ -61,7 +61,7 @@ class _Net:
 
     def send_request(
         self, dest_node: Address, method: str, *args: object
-                     ) -> None:
+    ) -> str | None:
         """Sends a network request to a specific node.
 
         Args:
@@ -91,7 +91,7 @@ class _Net:
                 sock.send(request.encode())
 
                 # Receive the response
-                response: bytes = sock.recv(1024).decode()
+                response: str = sock.recv(1024).decode()
 
                 return response
 
@@ -116,9 +116,11 @@ class _Net:
         """
         while self._running:
             try:
-                client_socket: socket.socket
-                address: Tuple[str, int]
-                client_socket, address = self.server_socket.accept()
+                client_socket: socket.socket | None = None
+                address: Tuple[str, int] | None = None
+
+                if self.server_socket:
+                    client_socket, address = self.server_socket.accept()
                 # Handle each connection in a separate thread
                 threading.Thread(
                     target=self._handle_connection,

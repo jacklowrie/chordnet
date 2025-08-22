@@ -28,7 +28,7 @@ class Node:
     """
 
     address: Address
-    predecesor: Address | None
+    predecessor: Address | None
     finger_table: list[Address | None]
     _next: int
     _net: _Net
@@ -52,9 +52,9 @@ class Node:
         self._net = _Net(ip, port, self._process_request)
         self.is_running = False
 
-    def successor(self) -> Address | None:
+    def successor(self) -> Address:
         """Alias for self.finger_table[0]."""
-        return self.finger_table[0]
+        return self.finger_table[0] if self.finger_table[0] else self.address
 
     def create(self) -> None:
         """Creates a new Chord ring with this node as the initial member.
@@ -203,7 +203,9 @@ class Node:
                 'FIND_SUCCESSOR',
                 id
             )
-            return self._parse_address(response)
+            # return self._parse_address(response)
+            successor = self._parse_address(response)
+            return successor if successor else self.address
 
         except Exception as e:
             print(f"Find successor failed: {e}")
@@ -403,17 +405,17 @@ class Node:
             True if the node was accepted as a predecessor, False otherwise.
         """
         # Update predecessor if necessary
-        if (not self.predecessor or
-            self._is_between(
-                self.predecessor.key, self.address.key, notifying_node.key)
+        if not self.predecessor or self._is_between(
+                self.predecessor.key, self.address.key, notifying_node.key
         ):
             self.predecessor = notifying_node
             return True
-        return False
+        else:
+            return False
 
     def trace_successor(
         self, id: int, curr_hops: int
-    ) -> Tuple[str, int] | Address:
+    ) -> Tuple[str, int]:
         """Finds the successor node for a given identifier.
 
         Args:
@@ -425,7 +427,7 @@ class Node:
         """
         # If id is between this node and its successor
         if self._is_key_in_range(id):
-            return self.successor(), curr_hops
+            return str(self.successor()), curr_hops
             # return curr_hops
 
         # Find closest preceding node in my routing table.
@@ -434,7 +436,7 @@ class Node:
         # If closest preceding node is me, then I need to return
         # my own successor
         if closest_node == self.address:
-            return self.successor(), curr_hops
+            return str(self.successor()), curr_hops
 
         # If it's not me, forward my request to the closer node and
         # then return what they send back
@@ -446,6 +448,7 @@ class Node:
                 curr_hops
             )
             print(f"Raw response: {response}", file=sys.stderr) # Debugging line
+            assert response is not None
             parts = response.split(":")
             if len(parts) != 4:
                 raise ValueError(f"Invalid response format: {response}")
@@ -463,7 +466,7 @@ class Node:
         except Exception as e:
             print(f"trace successor failed: {e}")
             # Fallback to local successor if network request fails
-            return self.successor()
+            return str(self.successor()), -1
 
 
     def _process_request(
@@ -506,6 +509,7 @@ class Node:
                 notifier = self._parse_address(':'.join(
                     [args[0], args[1], args[2]])
                 )
+                assert notifier is not None
                 return "OK" if self._be_notified(notifier) else "IGNORED"
 
             except ValueError:
@@ -530,6 +534,7 @@ class Node:
         """
         if response == "nil":
             return None
+        assert response
         parts = response.split(':')
         if len(parts) == 3:
             address = Address(parts[1], int(parts[2]))
