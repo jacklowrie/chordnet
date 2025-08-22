@@ -22,7 +22,7 @@ Examples follow this practice.
 - [x] port over code from course project
 - [x] set up repo/project workflows, including using `uv`
 - [x] add robust testing
-- [ ] Add type annotations
+- [x] Add type annotations
 - [ ] make sure old mininet setup/raspi setups still work
 - [ ] make sure nodes can run on a single computer (same IP, diff't ports)
 - [ ] refactor to use asyncio
