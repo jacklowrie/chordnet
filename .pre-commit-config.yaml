@@ -33,3 +33,11 @@ repos:
         types: [python]
         args: ["run", "mypy"]
         always_run: true
+
+    -   id: pytest
+        name: PyTest
+        entry: uv
+        language: system
+        types: [python]
+        args: ["run", "pytest"]
+        always_run: true
