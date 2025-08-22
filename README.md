@@ -8,6 +8,9 @@ Fall 2024.
 
 `uv add chordnet`
 
+## Development
+See `CONTRIBUTING.md`.
+
 ## Usage
 to stay consistent with the language from the original paper, we recommend
 importing this package as `ring`:
