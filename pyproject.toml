@@ -92,3 +92,14 @@ ignore = ["F403", "F405"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+files = ["src", "tests"]
+exclude = [
+    '(^|.*/)__pycache__/',  # matches __pycache__ at any depth
+    '(^|.*/).ruff_cache/',
+    '(^|.*/).mypy_cache/',
+]
