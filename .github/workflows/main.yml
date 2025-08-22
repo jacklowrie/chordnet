@@ -10,18 +10,10 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
-
-
+  pipeline:
     uses: ./.github/workflows/pipeline.yml
     with:
-      os: ${{ matrix.os }}
-      python-version: ${{ matrix.python-version }}
+      os: ubuntu-latest
       run-lint: true
       run-typecheck: true
       run-test: true

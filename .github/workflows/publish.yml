@@ -25,10 +25,25 @@ jobs:
       run-test: true
       run-build: true
 
+  cross-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    uses: ./.github/workflows/pipeline.yml
+    with:
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+      run-lint: false
+      run-typecheck: false
+      run-test: true
+      run-build: false
+
   pypi-publish:
     runs-on: ubuntu-latest
     needs:
-      - build-package
+      - [build-package, cross-test]
     permissions:
       id-token: write
 
