@@ -1,7 +1,7 @@
 """test_net.py: tests for the _Net class."""
 import socket
 import sys
-from typing import Callable, List, Optional, Tuple
+from typing import Generator, List, Optional, Tuple
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -254,7 +254,7 @@ def test_listen_for_connections_accept_exception(
     net._running = True # Ensure the loop runs at least once
 
     def controlled_accept_side_effect_generator() -> \
-            Callable[[], Tuple[MagicMock, MagicMock]]:
+             Generator[Exception | Tuple[MagicMock, MagicMock], None, None]:
         """Generator to simulate controlled accept side effects."""
         yield Exception("Simulated accept error") # First call raises
         # If _listen_for_connections tried to accept again,

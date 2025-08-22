@@ -1,6 +1,6 @@
 """test_node.py: tests for the Node class."""
 import hashlib
-from typing import Any, Tuple
+from typing import Any, Generator, Tuple
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -16,7 +16,7 @@ key: int = int(hashlib.sha1(f"{ip}:{port}".encode()).hexdigest(), 16) % (2**16)
 
 
 @pytest.fixture(autouse=True)
-def mock_start() -> None:
+def mock_start() -> Generator[None, None, None]:
     """Mocks ChordNode.start() to prevent actual socket operations.
 
     This fixture is autoused, meaning it runs before every test.
@@ -197,7 +197,7 @@ def test_closest_preceding_finger_sparse_finger_table(node: ChordNode) -> None:
 
 
 @pytest.fixture
-def mock_send_request(node: ChordNode) -> MagicMock:
+def mock_send_request(node: ChordNode) -> Generator[MagicMock]:
     """Mocks the _net.send_request method of the ChordNode.
 
     Args:
@@ -605,7 +605,7 @@ def test_check_predecessor_no_predecessor_set(
 
 @pytest.fixture
 def setup_stabilize_mocks(
-        node: ChordNode) -> Tuple[MagicMock, MagicMock, MagicMock]:
+        node: ChordNode) -> Generator[Tuple[MagicMock, MagicMock, MagicMock]]:
     """Provides mocked dependencies for stabilize tests.
 
     Mocks _net.send_request, node.notify, and node._parse_address.
@@ -773,7 +773,7 @@ def test_stabilize_network_error(
 @pytest.fixture
 def setup_find_successor_mocks(
     node: ChordNode
-) -> Tuple[MagicMock, MagicMock, MagicMock, MagicMock]:
+) -> Generator[Tuple[MagicMock, MagicMock, MagicMock, MagicMock]]:
     """Provides mocked dependencies for find_successor tests.
 
     Mocks _is_key_in_range, closest_preceding_finger, _net.send_request,
@@ -812,6 +812,7 @@ def test_find_successor_key_in_range(
         mock_send_request, mock_parse_address = setup_find_successor_mocks
     node.address.key = 100
     node.finger_table[0] = Address("1.1.1.1", 1111)
+    assert(node.finger_table[0])
     node.finger_table[0].key = 200 # Set key for this test's logic
     mock_is_key_in_range.return_value = True
 
@@ -844,6 +845,7 @@ def test_find_successor_closest_preceding_is_self(
         mock_send_request, mock_parse_address = setup_find_successor_mocks
     node.address.key = 100
     node.finger_table[0] = Address("1.1.1.1", 1111)
+    assert(node.finger_table[0])
     node.finger_table[0].key = 200
     mock_is_key_in_range.return_value = False # Not in range
 
@@ -878,6 +880,7 @@ def test_find_successor_forward_request(
         mock_send_request, mock_parse_address = setup_find_successor_mocks
     node.address.key = 100
     node.finger_table[0] = Address("1.1.1.1", 1111)
+    assert(node.finger_table[0])
     node.finger_table[0].key = 200
     mock_is_key_in_range.return_value = False
 
@@ -923,6 +926,7 @@ def test_find_successor_network_error_fallback(
         mock_send_request, mock_parse_address = setup_find_successor_mocks
     node.address.key = 100
     node.finger_table[0] = Address("1.1.1.1", 1111)
+    assert(node.finger_table[0])
     node.finger_table[0].key = 200
     mock_is_key_in_range.return_value = False
 
@@ -943,7 +947,7 @@ def test_find_successor_network_error_fallback(
 
 
 @pytest.fixture
-def setup_fix_fingers_mocks(node: ChordNode) -> MagicMock:
+def setup_fix_fingers_mocks(node: ChordNode) -> Generator[MagicMock]:
     """Provides mocked dependencies for fix_fingers tests.
 
     Mocks node.find_successor.
@@ -1038,6 +1042,7 @@ def test_fix_fingers_network_error(
     mock_find_successor: MagicMock = setup_fix_fingers_mocks
     node.address.key = 1000
     node.finger_table[0] = Address("1.1.1.1", 1111)
+    assert(node.finger_table[0])
     node.finger_table[0].key = 1001
     node._next = 5 # Some finger
 
@@ -1056,7 +1061,7 @@ def test_fix_fingers_network_error(
 @pytest.fixture
 def setup_trace_successor_mocks(
     node: ChordNode
-) -> Tuple[MagicMock, MagicMock, MagicMock]:
+) -> Generator[Tuple[MagicMock, MagicMock, MagicMock]]:
     """Provides mocked dependencies for trace_successor tests.
 
     Mocks _is_key_in_range, closest_preceding_finger, and _net.send_request.
@@ -1092,6 +1097,7 @@ def test_trace_successor_key_in_range(
         mock_send_request = setup_trace_successor_mocks
     node.address.key = 100
     node.finger_table[0] = Address("1.1.1.1", 1111)
+    assert(node.finger_table[0])
     node.finger_table[0].key = 200
     mock_is_key_in_range.return_value = True
 
@@ -1127,6 +1133,7 @@ def test_trace_successor_closest_preceding_is_self(
         mock_send_request = setup_trace_successor_mocks
     node.address.key = 100
     node.finger_table[0] = Address("1.1.1.1", 1111)
+    assert(node.finger_table[0])
     node.finger_table[0].key = 200
     mock_is_key_in_range.return_value = False # Not in range
 
@@ -1163,6 +1170,7 @@ def test_trace_successor_forward_request(
         mock_send_request = setup_trace_successor_mocks
     node.address.key = 100
     node.finger_table[0] = Address("1.1.1.1", 1111)
+    assert(node.finger_table[0])
     node.finger_table[0].key = 200
     mock_is_key_in_range.return_value = False
 
@@ -1220,6 +1228,7 @@ def test_trace_successor_network_error_fallback(
         mock_send_request = setup_trace_successor_mocks
     node.address.key = 100
     node.finger_table[0] = Address("1.1.1.1", 1111)
+    assert(node.finger_table[0])
     node.finger_table[0].key = 200
     mock_is_key_in_range.return_value = False
 
@@ -1247,7 +1256,7 @@ def test_trace_successor_network_error_fallback(
 @pytest.fixture
 def setup_process_request_mocks(
     node: ChordNode
-) -> Tuple[MagicMock, MagicMock, MagicMock, MagicMock]:
+) -> Generator[Tuple[MagicMock, MagicMock, MagicMock, MagicMock]]:
     """Provides mocked dependencies for _process_request tests.
 
     Mocks find_successor, trace_successor, _be_notified, and _parse_address.
