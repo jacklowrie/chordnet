@@ -86,8 +86,10 @@ def test_is_key_in_range(node: ChordNode) -> None:
     # Test exact node key (should return False)
     assert node._is_key_in_range(node.address.key) is False
 
+    successor = node.successor()
+    assert successor
     # Test successor's key (should return False)
-    assert node._is_key_in_range(node.successor().key) is False
+    assert node._is_key_in_range(successor.key) is False
 
     # Test wrap-around scenario
     # Create a scenario where node's key is near the end of the hash space
@@ -197,7 +199,7 @@ def test_closest_preceding_finger_sparse_finger_table(node: ChordNode) -> None:
 
 
 @pytest.fixture
-def mock_send_request(node: ChordNode) -> Generator[MagicMock]:
+def mock_send_request(node: ChordNode) -> Generator[MagicMock, None, None]:
     """Mocks the _net.send_request method of the ChordNode.
 
     Args:
@@ -317,10 +319,11 @@ def test_join_success(node: ChordNode, mock_send_request: MagicMock) -> None:
         node.address.key
     )
     # Assert successor is set
-    assert node.successor() is not None
-    assert node.successor().key == mock_successor_key
-    assert node.successor().ip == mock_successor_ip
-    assert node.successor().port == mock_successor_port
+    successor = node.successor()
+    assert successor is not None
+    assert successor.key == mock_successor_key
+    assert successor.ip == mock_successor_ip
+    assert successor.port == mock_successor_port
     # Assert _next was incremented after fix_fingers is called
     assert node._next == 1
 
@@ -605,7 +608,8 @@ def test_check_predecessor_no_predecessor_set(
 
 @pytest.fixture
 def setup_stabilize_mocks(
-        node: ChordNode) -> Generator[Tuple[MagicMock, MagicMock, MagicMock]]:
+        node: ChordNode
+) -> Generator[Tuple[MagicMock, MagicMock, MagicMock], None, None]:
     """Provides mocked dependencies for stabilize tests.
 
     Mocks _net.send_request, node.notify, and node._parse_address.
@@ -773,7 +777,7 @@ def test_stabilize_network_error(
 @pytest.fixture
 def setup_find_successor_mocks(
     node: ChordNode
-) -> Generator[Tuple[MagicMock, MagicMock, MagicMock, MagicMock]]:
+) -> Generator[Tuple[MagicMock, MagicMock, MagicMock, MagicMock], None, None]:
     """Provides mocked dependencies for find_successor tests.
 
     Mocks _is_key_in_range, closest_preceding_finger, _net.send_request,
@@ -947,7 +951,9 @@ def test_find_successor_network_error_fallback(
 
 
 @pytest.fixture
-def setup_fix_fingers_mocks(node: ChordNode) -> Generator[MagicMock]:
+def setup_fix_fingers_mocks(
+    node: ChordNode
+) -> Generator[MagicMock, None, None]:
     """Provides mocked dependencies for fix_fingers tests.
 
     Mocks node.find_successor.
@@ -1061,7 +1067,7 @@ def test_fix_fingers_network_error(
 @pytest.fixture
 def setup_trace_successor_mocks(
     node: ChordNode
-) -> Generator[Tuple[MagicMock, MagicMock, MagicMock]]:
+) -> Generator[Tuple[MagicMock, MagicMock, MagicMock], None, None]:
     """Provides mocked dependencies for trace_successor tests.
 
     Mocks _is_key_in_range, closest_preceding_finger, and _net.send_request.
@@ -1107,7 +1113,7 @@ def test_trace_successor_key_in_range(
     result_hops: int
     result_address, result_hops = node.trace_successor(target_id, initial_hops)
 
-    assert result_address == node.successor()
+    assert result_address == str(node.successor())
     assert result_hops == initial_hops
     mock_is_key_in_range.assert_called_once_with(target_id)
     mock_cpf.assert_not_called()
@@ -1144,7 +1150,7 @@ def test_trace_successor_closest_preceding_is_self(
     result_address: Any
     result_hops: int
     result_address, result_hops = node.trace_successor(target_id, initial_hops)
-    assert result_address == node.successor()
+    assert result_address == str(node.successor())
     assert result_hops == initial_hops
     mock_is_key_in_range.assert_called_once_with(target_id)
     mock_cpf.assert_called_once_with(target_id)
@@ -1243,10 +1249,10 @@ def test_trace_successor_network_error_fallback(
     # When `trace_successor` encounters an exception, it returns
     # `self.successor()` directly (an Address object).
     # This is inconsistent with its successful return type `(Address, int)`
-    result: Tuple[str, int] | Address = node.trace_successor(
+    result = node.trace_successor(
         target_id, initial_hops)
 
-    assert result == node.successor()
+    assert result[0] == str(node.successor())
     mock_is_key_in_range.assert_called_once_with(target_id)
     mock_cpf.assert_called_once_with(target_id)
     mock_send_request.assert_called_once_with(
@@ -1256,7 +1262,7 @@ def test_trace_successor_network_error_fallback(
 @pytest.fixture
 def setup_process_request_mocks(
     node: ChordNode
-) -> Generator[Tuple[MagicMock, MagicMock, MagicMock, MagicMock]]:
+) -> Generator[Tuple[MagicMock, MagicMock, MagicMock, MagicMock], None, None]:
     """Provides mocked dependencies for _process_request tests.
 
     Mocks find_successor, trace_successor, _be_notified, and _parse_address.

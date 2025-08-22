@@ -52,9 +52,10 @@ class Node:
         self._net = _Net(ip, port, self._process_request)
         self.is_running = False
 
-    def successor(self) -> Address:
+    def successor(self) -> Address | None:
         """Alias for self.finger_table[0]."""
-        return self.finger_table[0] if self.finger_table[0] else self.address
+        return self.finger_table[0]
+        # return self.finger_table[0] if self.finger_table[0] else self.address
 
     def create(self) -> None:
         """Creates a new Chord ring with this node as the initial member.
@@ -184,8 +185,9 @@ class Node:
             The address of the node responsible for the given identifier.
         """
         # If id is between this node and its successor
-        if self._is_key_in_range(id):
-            return self.successor()
+        curr_successor = self.successor()
+        if curr_successor and self._is_key_in_range(id):
+            return curr_successor
 
         # Find closest preceding node in my routing table.
         closest_node = self.closest_preceding_finger(id)
@@ -193,7 +195,7 @@ class Node:
         # If closest preceding node is me,
         # then I need to return my own successor
         if closest_node == self.address:
-            return self.successor()
+            return curr_successor if curr_successor else self.address
 
         # If it's not me, forward my request to the closer node and
         # then return what they send back
@@ -210,7 +212,7 @@ class Node:
         except Exception as e:
             print(f"Find successor failed: {e}")
             # Fallback to local successor if network request fails
-            return self.successor()
+            return curr_successor if curr_successor else self.address
 
 
     def closest_preceding_finger(self, id: int) -> Address:
@@ -268,7 +270,8 @@ class Node:
         # if x is between this node and its successor
         #     set successor to x
         # notify successor about this node
-        if not self.successor():
+        curr_successor = self.successor()
+        if curr_successor is None:
             return
 
         x = None
@@ -278,14 +281,14 @@ class Node:
             #print(f"stabilize: checking successor {self.successor().key}" \
             #for predecessor", file=sys.stderr)
             x_response = self._net.send_request(
-                self.successor(), 'GET_PREDECESSOR')
+                curr_successor, 'GET_PREDECESSOR')
 
             #print(f"stabilize: predecessor found: {x_response}",
             #file=sys.stderr)
             x = self._parse_address(x_response)
 
             if x and self._is_between(
-                    self.address.key, self.successor().key, x.key
+                    self.address.key, curr_successor.key, x.key
             ):
                 self.finger_table[0] = x
                 #print(
@@ -360,16 +363,15 @@ class Node:
         Returns:
             bool: True if the key is in the node's range, False otherwise.
         """
-        if not self.successor(): # no successor case
+        successor = self.successor()
+        if successor is None: # no successor case
             return True
 
-        successor_key = self.successor().key
-
-        if self.address.key < successor_key:
+        if self.address.key < successor.key:
             # Normal case: key is strictly between node and successor
-            return self.address.key < key < successor_key
+            return self.address.key < key < successor.key
         else:  # Wrap around case
-            return key > self.address.key or key < successor_key
+            return key > self.address.key or key < successor.key
 
 
 
@@ -512,7 +514,7 @@ class Node:
                 assert notifier is not None
                 return "OK" if self._be_notified(notifier) else "IGNORED"
 
-            except ValueError:
+            except (ValueError, AssertionError):
                 return "INVALID_NODE"
         else:
             return "INVALID_METHOD"
