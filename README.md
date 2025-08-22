@@ -1,6 +1,6 @@
 # ChordNet
 Python implementation of the chord protocol, introduced by Stoica et al.
-This library began as a group project for cs536 at Purdue University in
+This library began as a [group project](https://github.com/jacklowrie/chord) for cs536 at Purdue University in
 Fall 2024.
 
 ## Installation
