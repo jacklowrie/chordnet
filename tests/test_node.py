@@ -1,4 +1,8 @@
-"""test_node.py: tests for the Node class."""
+"""test_node.py: tests for the Node class.
+
+NOTE: many of these tests were AI generated as regression tests, in preparation
+for refactoring.
+"""
 import hashlib
 from typing import Any, Generator, Tuple
 from unittest.mock import MagicMock, patch

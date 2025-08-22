@@ -1,4 +1,8 @@
-"""test_net.py: tests for the _Net class."""
+"""test_net.py: tests for the _Net class.
+
+NOTE: many of these tests were AI generated as regression tests, in preparation
+for refactoring.
+"""
 import socket
 import sys
 from typing import Generator, List, Optional, Tuple
