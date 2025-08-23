@@ -129,6 +129,7 @@ class _Net:
                 ).start()
             except Exception as e:
                 if self._running:
+                    print(f"Error accepting connection: {e}\n")
                     sys.stderr.write(f"Error accepting connection: {e}\n")
                     sys.stderr.flush()
 

@@ -1,6 +1,6 @@
 [project]
 name = "chordnet"
-version = "0.1.0"
+version = "0.2.0"
 license = "MIT"
 license-files = ["LICENSE"]
 description = "Implementation of the chord peer-to-peer networking protocol, introduced by Stoica et al."
@@ -16,7 +16,7 @@ classifiers = [
     #   4 - Beta
     #   5 - Production/Stable
     #   7 - Inactive
-    "Development Status :: 1 - Planning",
+    "Development Status :: 2 - Pre-Alpha",
 
     # Indicate who your project is intended for
     "Intended Audience :: Developers",
@@ -58,6 +58,7 @@ explicit = true
 
 [dependency-groups]
 dev = [
+    "bpython>=0.25",
     "mypy>=1.17.1",
     "pre-commit>=4.3.0",
     "pytest>=8.4.1",
@@ -68,7 +69,7 @@ dev = [
 minversion = "6.0"
 addopts = "-ra -q"
 pythonpath = [
- "src"
+ "src",
 ]
 testpaths = [
     "tests",
