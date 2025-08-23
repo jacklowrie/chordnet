@@ -46,7 +46,7 @@ jobs:
       - build-package
       - cross-test
     permissions:
-      content: write
+      contents: write
     steps:
       - name: Retrieve release distributions
         uses: actions/download-artifact@v4
