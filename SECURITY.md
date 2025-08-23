@@ -1,6 +1,6 @@
 # Security Policy
 
-Thank you for your interest in keeping Chordnet secure! As a single-developer project, I appreciate your help in reporting any vulnerabilities you may find.
+Thank you for your interest in keeping Chordnet secure!
 
 ## Reporting a Vulnerability
 
