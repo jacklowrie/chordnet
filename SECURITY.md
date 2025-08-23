@@ -4,7 +4,7 @@ Thank you for your interest in keeping Chordnet secure! As a single-developer pr
 
 ## Reporting a Vulnerability
 
-If you discover a security issue, **please do not open a public issue**. Instead, email me directly at [your@email.com] with details.
+If you discover a security issue, **please do not open a public issue**. Instead, email me directly at [castles-modular.3v@icloud.com] with details.
 
 - Provide as much information as possible to help reproduce and address the issue (e.g., steps to reproduce, environment, affected versions, and any relevant logs or screenshots).
 - I aim to acknowledge security reports within **7 days**. Resolution or a fix may take longer depending on complexity and my availability, but I will keep you updated.
@@ -28,7 +28,7 @@ Please avoid publicly disclosing vulnerabilities without prior coordination. I a
 
 ## Contact
 
-Email: [your@email.com]  
+Email: [castles-modular.3v@icloud.com]  
 GitHub: [https://github.com/jacklowrie](https://github.com/jacklowrie)
 
 ---
