@@ -95,7 +95,7 @@ jobs:
     # build distribution if flagged
     - name: Run build
       if: ${{ inputs.run-build }}
-      run: uv build
+      run: uv build --no-sources
 
     - name: Upload distributions
       if: ${{ inputs.run-build }}
