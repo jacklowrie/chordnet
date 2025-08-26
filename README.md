@@ -1,6 +1,6 @@
 # ChordNet
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/jacklowrie/chordnet/main.yml?logo=GitHub&label=Main%20Branch%20Build)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/jacklowrie/chordnet/publish.yml?logo=GitHub&label=PyPI%20Published%20Build)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/jacklowrie/chordnet/release.yml?logo=GitHub&label=PyPI%20Published%20Build)
 
 ![GitHub License](https://img.shields.io/github/license/jacklowrie/chordnet?logo=github)
 ![PyPI - Types](https://img.shields.io/pypi/types/chordnet?logo=pypi)
