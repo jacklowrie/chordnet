@@ -58,6 +58,7 @@ class Address:
         """
         if not isinstance(other, Address):
             return NotImplemented
+
         return (self.ip == other.ip and
                 self.port == other.port and
                 self.key == other.key)
