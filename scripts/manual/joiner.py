@@ -6,14 +6,19 @@ import bpython
 from chordnet import Node as ChordNode
 
 
+def step(node: ChordNode) -> None:
+    """Runs the periodic tasks for the node once."""
+    node.stabilize()
+    node.fix_fingers()
+
 def main() -> None:
     """Creates a new ring with this computer as the only node."""
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         print("usage: [uv run] python " \
               "joiner.py this_ip this_port target_ip target_port")
         exit(1)
 
-        # Get IP and port from command line arguments
+    # Get IP and port from command line arguments
     ip = sys.argv[1]
     port = int(sys.argv[2])
     target_ip = sys.argv[3]

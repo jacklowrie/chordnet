@@ -6,6 +6,11 @@ import bpython
 from chordnet import Node as ChordNode
 
 
+def step(node: ChordNode) -> None:
+    """Runs the periodic tasks for the node once."""
+    node.stabilize()
+    node.fix_fingers()
+
 def main() -> None:
     """Creates a new ring with this computer as the only node."""
     if len(sys.argv) != 3:
