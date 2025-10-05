@@ -11,6 +11,10 @@ def step(node: ChordNode) -> None:
     node.stabilize()
     node.fix_fingers()
 
+    print(f"pred: {node.predecessor} succ: {node.successor()}")
+    print(node.finger_table)
+
+
 def main() -> None:
     """Creates a new ring with this computer as the only node."""
     if len(sys.argv) != 3:
@@ -24,7 +28,12 @@ def main() -> None:
     # create (start) the ring
     node.create()
     print(f"Node created as \"node\": {node.address}", file=sys.stderr)
-    bpython.embed(locals_=locals())
+    repl_locals = {
+        'node': node,
+        'step': step,
+    }
+    print("starting repl. access `node`, advance with `step(node)`")
+    bpython.embed(locals_=repl_locals)
     node.stop()
 
 

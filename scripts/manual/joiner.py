@@ -11,9 +11,12 @@ def step(node: ChordNode) -> None:
     node.stabilize()
     node.fix_fingers()
 
+    print(f"pred: {node.predecessor} succ: {node.successor()}")
+    print(node.finger_table)
+
 def main() -> None:
     """Creates a new ring with this computer as the only node."""
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 5:
         print("usage: [uv run] python " \
               "joiner.py this_ip this_port target_ip target_port")
         exit(1)
@@ -27,7 +30,12 @@ def main() -> None:
     # Create and join node
     node = ChordNode(ip, port)
     node.join(target_ip, target_port)
-    bpython.embed(locals_=locals())
+    repl_locals = {
+        'node': node,
+        'step': step,
+    }
+    print("starting repl. access `node`, advance with `step(node)`")
+    bpython.embed(locals_=repl_locals)
     node.stop()
 
 
