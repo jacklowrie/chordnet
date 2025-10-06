@@ -35,7 +35,7 @@ jobs:
         run: uv sync --frozen --all-extras --dev
 
       - name: Build docs
-        run: pdoc -o docs/ chordnet
+        run: uv run pdoc -o docs/ chordnet
 
       - uses: actions/upload-pages-artifact@v4
         with:
