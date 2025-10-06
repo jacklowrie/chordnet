@@ -4,10 +4,8 @@ name: Documentation
 on:
   push:
     branches:
-      - main
-    # Alternative: only build for tags.
-    # tags:
-    #   - '*'
+     tags:
+       - '*'
 
 # security: restrict permissions for CI jobs.
 permissions:
