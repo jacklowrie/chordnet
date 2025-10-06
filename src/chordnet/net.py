@@ -4,6 +4,8 @@ import sys
 import threading
 from typing import Callable, Tuple
 
+from loguru import logger as log
+
 from .address import Address
 
 callback = Callable[[str, list[str]], str| Address | None]
@@ -86,7 +88,7 @@ class _Net:
                 request_args = ':'.join(str(arg) for arg in args)
                 request = f"{method}:{request_args}"
                 if (method == "TRACE_SUCCESSOR"):
-                    print ('[SENDING TRACE REQ]', request)
+                    log.debug("[SENDING TRACE REQ]", request)
                 # Send the request
                 sock.send(request.encode())
 
@@ -96,13 +98,13 @@ class _Net:
                 return response
 
         except socket.timeout:
-            print("Request timed out", file=sys.stderr)
+            log.info("Request timed out")
             return None
         except ConnectionRefusedError:
-            print("Connection refused", file=sys.stderr)
+            log.info("Connection refused")
             return None
         except Exception as e:
-            print(f"Network request error: {e}", file=sys.stderr)
+            log.info(f"Network request error: {e}")
             return None
 
 
@@ -129,7 +131,7 @@ class _Net:
                 ).start()
             except Exception as e:
                 if self._running:
-                    print(f"Error accepting connection: {e}\n")
+                    log.info(f"Error accepting connection: {e}\n")
                     sys.stderr.write(f"Error accepting connection: {e}\n")
                     sys.stderr.flush()
 
@@ -149,13 +151,13 @@ class _Net:
             method, *args = request.split(':')
 
             if method == 'TRACE_SUCCESSOR':
-                print(f"[NET]Received request: {request}", file=sys.stderr)
+                log.debug(f"[NET]Received request: {request}")
 
             # Dispatch to appropriate method
             response = self._request_handler(method, args)
 
             if method == 'TRACE_SUCCESSOR':
-                print(f"[NET]Sent response: {response}", file=sys.stderr)
+                log.debug(f"[NET]Sent response: {response}")
 
             # Send response
             client_socket.send(str(response).encode())
