@@ -61,7 +61,9 @@ classifiers = [
 ]
 
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "loguru>=0.7.3",
+]
 
 [build-system]
 requires = ["uv_build>=0.7.19,<0.8"]

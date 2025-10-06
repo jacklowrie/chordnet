@@ -1,6 +1,7 @@
 """node.py: Represents a node on a ring."""
-import sys
 from typing import Callable, Tuple
+
+from loguru import logger as log
 
 from .address import Address
 from .net import _Net
@@ -95,7 +96,7 @@ class Node:
                 self.finger_table[0] = self._parse_address(response)
                 msg = f"Node {self.address.key} joined the ring. " \
                         "Successor: {self.successor().key}"
-                print(msg, file=sys.stderr)
+                log.info(msg)
             else:
                 raise ValueError("Failed to find successor. Join failed")
 
@@ -104,7 +105,7 @@ class Node:
 
 
         except Exception as e:
-            print(f"Join failed: {e}")
+            log.info(f"Join failed: {e}")
             raise
 
 
@@ -118,7 +119,7 @@ class Node:
         gap = (2 ** self._next) % (2 ** Address._M)
 
         start = self.address.key + gap
-        #print(f"fixing finger {self._next}. gap is {gap}, " \
+        #log.info(f"fixing finger {self._next}. gap is {gap}, " \
         #"start of interval is: {start}")
 
         try:
@@ -126,7 +127,7 @@ class Node:
             responsible_node = self.find_successor(start)
             self.finger_table[self._next] = responsible_node
         except Exception as e:
-            print(f"fix_fingers failed for finger {self._next}: {e}")
+            log.debug(f"fix_fingers failed for finger {self._next}: {e}")
 
         # Move to the next finger table entry, wrapping around if necessary
         self._next = (self._next + 1) % Address._M
@@ -153,7 +154,7 @@ class Node:
         """
         if self._fix_fingers_timer and self._fix_fingers_timer.is_alive():
             # Timer is already running, no need to start again
-            print("Periodic tasks are already running.", file=sys.stderr)
+            log.info("Periodic tasks are already running.")
             return
         self.is_running = True
         self._run_fix_fingers(interval)
@@ -173,7 +174,7 @@ class Node:
         for i, finger in enumerate(self.finger_table):
             message += f"  Finger[{i}] -> {finger}\n"
 
-        print(message, file=sys.stderr)
+        log.info(message)
 
     def find_successor(self, id: int) -> Address:
         """Finds the successor node for a given identifier.
@@ -210,7 +211,7 @@ class Node:
             return successor if successor else self.address
 
         except Exception as e:
-            print(f"Find successor failed: {e}")
+            log.info(f"Find successor failed: {e}")
             # Fallback to local successor if network request fails
             return curr_successor if curr_successor else self.address
 
@@ -278,12 +279,12 @@ class Node:
 
         try:
             # Get the predecessor of the current successor
-            #print(f"stabilize: checking successor {self.successor().key}" \
-            #for predecessor", file=sys.stderr)
+            #log.info(f"stabilize: checking successor {self.successor().key}" \
+            #for predecessor")
             x_response = self._net.send_request(
                 curr_successor, 'GET_PREDECESSOR')
 
-            #print(f"stabilize: predecessor found: {x_response}",
+            #log.info(f"stabilize: predecessor found: {x_response}",
             #file=sys.stderr)
             x = self._parse_address(x_response)
 
@@ -291,18 +292,18 @@ class Node:
                     self.address.key, curr_successor.key, x.key
             ):
                 self.finger_table[0] = x
-                #print(
+                #log.info(
                 #f"stabilize: updated successor to {self.successor().key}",
                 #file=sys.stderr)
             # otherwise, we just notify them that we exist.
             # This is usually for the first joiner to a ring.
 
-            #print(f"Node {self.address} - Updated Successor:" \
+            #log.info(f"Node {self.address} - Updated Successor:" \
             #"{self.successor()}, Predecessor: {self.predecessor}",
             #file=sys.stderr)
 
         except Exception as e:
-            print(f"Stabilize failed: {e}", file=sys.stderr)
+            log.info(f"Stabilize failed: {e}")
         finally:
             self.notify(self.successor())
 
@@ -332,7 +333,7 @@ class Node:
             else:
                 return False
         except Exception as e:
-            print(f"Notify failed: {e}", file=sys.stderr)
+            log.info(f"Notify failed: {e}")
             return False
 
 
@@ -449,7 +450,7 @@ class Node:
                 id,
                 curr_hops
             )
-            print(f"Raw response: {response}", file=sys.stderr) # Debugging line
+            log.debug(f"Raw response: {response}") # Debugging line
             assert response is not None
             parts = response.split(":")
             if len(parts) != 4:
@@ -459,14 +460,14 @@ class Node:
             # resolved_node.key = int(node_key)
             response_split = response.split(":")
             address = ':'.join(response_split[:-1])
-            print ("[trace]Joined Address :", address)
+            log.info("[trace]Joined Address :", address)
             # address = '':'.join(response[:2])
             return address, int(hops)+1
 
             # return self._parse_address(response), hops
 
         except Exception as e:
-            print(f"trace successor failed: {e}")
+            log.info(f"trace successor failed: {e}")
             # Fallback to local successor if network request fails
             return str(self.successor()), -1
 
@@ -490,14 +491,14 @@ class Node:
         elif method == "TRACE_SUCCESSOR":
             try:
                 id, hops = int(args[0]), int(args[1])
-                print ("[NODE] Current ID ", id, "Current hops ", hops)
+                log.info("[NODE] Current ID ", id, "Current hops ", hops)
                 successor, hops = self.trace_successor(id, hops)
 
-                print ("SUCCESSSOR NODE :", successor, "HOPS :", hops)
+                log.info("SUCCESSSOR NODE :", successor, "HOPS :", hops)
                 returnString = f"{successor}:{hops}"
                 return returnString
             except Exception as e:
-                print(f"TRACE_SUCCESSOR error: {e}", file=sys.stderr)
+                log.info(f"TRACE_SUCCESSOR error: {e}")
                 return "ERROR:Invalid TRACE_SUCCESSOR Request"
 
         elif method == 'GET_PREDECESSOR':
