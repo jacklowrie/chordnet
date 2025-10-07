@@ -1,4 +1,5 @@
 """node.py: Represents a node on a ring."""
+import threading
 from typing import Callable, Tuple
 
 from loguru import logger as log
@@ -33,14 +34,16 @@ class Node:
     finger_table: list[Address | None]
     _next: int
     _net: _Net
+    _timer: threading.Timer | None
     is_running: bool
 
-    def __init__(self, ip: str, port: int) -> None:
+    def __init__(self, ip: str, port: int, daemon:bool=True) -> None:
         """Initializes a new Chord node.
 
         Args:
-            ip (str): IP address for the node.
-            port (int): Port number to listen on.
+            ip: IP address for the node.
+            port: Port number to listen on.
+            daemon: whether to run the daemon.
         """
         self.address = Address(ip, port)
 
@@ -131,43 +134,27 @@ class Node:
 
         # Move to the next finger table entry, wrapping around if necessary
         self._next = (self._next + 1) % Address._M
-    '''
-    def _run_fix_fingers(self, interval=1.0):
-        """
-        Periodically invokes fix_fingers every `interval` seconds.
+
+    def _daemon(self, interval:float = 1.0, debug:bool = True) -> None:
+        """Runs fix_fingers and stabilize periodically.
 
         Args:
-            interval (float): Time interval between updates (in seconds).
+            interval: Time interval between periodic calls.
+            debug: Whether to print node state
         """
-        self.fix_fingers()
-        # Schedule the next execution
-        self._fix_fingers_timer = threading.Timer(
-                        interval, self._run_fix_fingers, args=[interval])
-        self._fix_fingers_timer.start()
+        if self.is_running:
+            self.stabilize()
+            self.fix_fingers()
+            if debug:
+                print(f"pred: {self.predecessor}, succ: {self.successor()}")
+                print(self.finger_table)
 
-    def start_periodic_tasks(self, interval=1.0):
-        """
-        Starts periodic tasks for the node, including fix_fingers.
+            self._timer = threading.Timer(interval, self._daemon)
+            self._timer.daemon = True
+            self._timer.start()
 
-        Args:
-            interval (float): Time interval between periodic calls.
-        """
-        if self._fix_fingers_timer and self._fix_fingers_timer.is_alive():
-            # Timer is already running, no need to start again
-            log.info("Periodic tasks are already running.")
-            return
-        self.is_running = True
-        self._run_fix_fingers(interval)
 
-    def stop_periodic_tasks(self):
-        """
-        Stops periodic tasks for the node gracefully.
-        """
-        if self._fix_fingers_timer:
-            self._fix_fingers_timer.cancel()
-            self._fix_fingers_timer = None
-        self.is_running = False
-    '''
+
     def log_finger_table(self) -> None:
         """Logs the entire finger table to the log file."""
         message = "Current Finger Table:\n"
@@ -337,21 +324,38 @@ class Node:
             return False
 
 
-    def start(self) -> None:
-        """Starts the Chord node's network listener.
+    def start(
+        self, daemon: bool = True, interval: float = 1.0, debug:bool = False
+    ) -> None:
+        """Starts the Chord node's daemon and network listener.
 
         Begins accepting incoming network connections in a separate thread.
+
+        Args:
+            daemon: whether to run a daemon
+                    (runs fix_fingers and stabilize periodically
+            interval: interval daemon sleeps for (only relevant if daemon=True)
+            debug: whether to print the state of the node
+                    (again only relevant to daemon)
         """
         self._net.start()
+        self.is_running = True
+        if daemon:
+            self._daemon(interval, debug)
 
 
 
     def stop(self) -> None:
-        """Gracefully stops the Chord node's network listener.
+        """Gracefully stops the Chord node's daemon and network listener.
 
         Closes the server socket and waits for the network thread to terminate.
         """
         self._net.stop()
+        if self._timer:
+            self._timer.cancel()
+            self._timer = None
+        self.is_running = False
+
 
 
 
