@@ -21,7 +21,7 @@ def main() -> None:
     target_port = int(sys.argv[4])
 
     # Create and join node
-    node = ChordNode(ip, port)
+    node = ChordNode(ip, port, daemon=False)
     node.join(target_ip, target_port)
     repl_locals = {
         'node': node,

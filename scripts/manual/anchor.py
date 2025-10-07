@@ -16,7 +16,7 @@ def main() -> None:
     ip = sys.argv[1]
     port = int(sys.argv[2])
 
-    node = ChordNode(ip, port)
+    node = ChordNode(ip, port, daemon=False)
     # create (start) the ring
     node.create()
     print(f"Node created as \"node\": {node.address}", file=sys.stderr)
