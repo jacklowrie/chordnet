@@ -36,14 +36,25 @@ class Node:
     _net: _Net
     _timer: threading.Timer | None
     is_running: bool
+    _use_daemon: bool
+    _interval: float
+    _debug: bool
 
-    def __init__(self, ip: str, port: int, daemon:bool=True) -> None:
+    def __init__(self,
+                 ip: str,
+                 port: int,
+                 daemon:bool=True,
+                 interval:float=1.0,
+                 debug:bool=False
+    ) -> None:
         """Initializes a new Chord node.
 
         Args:
             ip: IP address for the node.
             port: Port number to listen on.
             daemon: whether to run the daemon.
+            interval: daemon interval.
+            debug: whether to print node state after every daemon run.
         """
         self.address = Address(ip, port)
 
@@ -55,6 +66,10 @@ class Node:
         # Networking
         self._net = _Net(ip, port, self._process_request)
         self.is_running = False
+
+        self._use_daemon = daemon
+        self._interval = interval
+        self._debug = debug
 
     def successor(self) -> Address | None:
         """Alias for self.finger_table[0]."""
@@ -135,21 +150,21 @@ class Node:
         # Move to the next finger table entry, wrapping around if necessary
         self._next = (self._next + 1) % Address._M
 
-    def _daemon(self, interval:float = 1.0, debug:bool = True) -> None:
+    def _daemon(self) -> None:
         """Runs fix_fingers and stabilize periodically.
 
         Args:
             interval: Time interval between periodic calls.
             debug: Whether to print node state
         """
-        if self.is_running:
+        if self._use_daemon and self.is_running:
             self.stabilize()
             self.fix_fingers()
-            if debug:
+            if self._debug:
                 print(f"pred: {self.predecessor}, succ: {self.successor()}")
                 print(self.finger_table)
 
-            self._timer = threading.Timer(interval, self._daemon)
+            self._timer = threading.Timer(self._interval, self._daemon)
             self._timer.daemon = True
             self._timer.start()
 
@@ -324,9 +339,7 @@ class Node:
             return False
 
 
-    def start(
-        self, daemon: bool = True, interval: float = 1.0, debug:bool = False
-    ) -> None:
+    def start(self) -> None:
         """Starts the Chord node's daemon and network listener.
 
         Begins accepting incoming network connections in a separate thread.
@@ -340,8 +353,8 @@ class Node:
         """
         self._net.start()
         self.is_running = True
-        if daemon:
-            self._daemon(interval, debug)
+        if self._use_daemon:
+            self._daemon()
 
 
 
