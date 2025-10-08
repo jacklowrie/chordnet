@@ -70,6 +70,7 @@ class Node:
         self._use_daemon = daemon
         self._interval = interval
         self._debug = debug
+        self._timer = None
 
     def successor(self) -> Address | None:
         """Alias for self.finger_table[0]."""
@@ -158,15 +159,30 @@ class Node:
             debug: Whether to print node state
         """
         if self._use_daemon and self.is_running:
-            self.stabilize()
-            self.fix_fingers()
-            if self._debug:
-                print(f"pred: {self.predecessor}, succ: {self.successor()}")
-                print(self.finger_table)
+            try:
+                self.stabilize()
+                self.fix_fingers()
+                if self._debug:
+                    print(f"pred: {self.predecessor}, succ: {self.successor()}")
+                    print(self.finger_table)
 
-            self._timer = threading.Timer(self._interval, self._daemon)
-            self._timer.daemon = True
-            self._timer.start()
+            except Exception as e:
+                # Catch any unhandled exception within the daemon's tasks
+                # and log it properly. This is crucial for debugging.
+                log.error(
+                    f"Unhandled exception in daemon for {self.address}: {e}"
+                )
+                # You might want to optionally stop the daemon here
+                # if continuous failures are problematic
+                # self.stop()
+
+            finally:
+                # Always reschedule the timer, even if an exception occurred,
+                # unless you decided to stop the daemon above.
+                if self.is_running:
+                    self._timer = threading.Timer(self._interval, self._daemon)
+                    self._timer.daemon = True
+                    self._timer.start()
 
 
 
