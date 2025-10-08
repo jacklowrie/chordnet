@@ -1,6 +1,9 @@
 # Contributing
 Please get in touch before starting work or opening a PR, to avoid
-duplicating work. Opening an issue works well for now.
+duplicating work. Opening an issue works well for now. If you see an unassigned
+open issue you want to work on, please leave a comment on it - assigned issues
+are spearheaded by the assignee, if they need help they will coordinate on the
+issue.
 
 ## Development
 This project uses `uv` and `pre-commit`.
