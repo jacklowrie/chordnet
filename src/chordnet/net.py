@@ -162,7 +162,6 @@ class _Net:
             # Send response
             client_socket.send(str(response).encode())
         except Exception as e:
-            sys.stderr.write(f"Error handling connection: {e}\n")
-            sys.stderr.flush()
+            log.error(f"Error handling connection: {e}")
         finally:
             client_socket.close()

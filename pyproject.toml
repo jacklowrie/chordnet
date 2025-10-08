@@ -77,7 +77,7 @@ explicit = true
 
 [dependency-groups]
 dev = [
-    "bpython>=0.25",
+    "ipython>=8.37.0",
     "mypy>=1.17.1",
     "pdoc>=15.0.4",
     "pre-commit>=4.3.0",

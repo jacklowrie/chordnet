@@ -1,7 +1,7 @@
 """joiner.py: creates a joining node for debugging."""
 import sys
 
-import bpython
+import IPython
 from step import step  #type: ignore
 
 from chordnet import Node as ChordNode
@@ -21,14 +21,14 @@ def main() -> None:
     target_port = int(sys.argv[4])
 
     # Create and join node
-    node = ChordNode(ip, port)
+    node = ChordNode(ip, port, daemon=False)
     node.join(target_ip, target_port)
     repl_locals = {
         'node': node,
         'step': step,
     }
     print("starting repl. access `node`, advance with `step(node)`")
-    bpython.embed(locals_=repl_locals)
+    IPython.embed(user_ns=repl_locals)
     node.stop()
 
 
