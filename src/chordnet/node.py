@@ -290,8 +290,14 @@ class Node:
         #     set successor to x
         # notify successor about this node
         curr_successor = self.successor()
-        if curr_successor is None:
+        if curr_successor is None or curr_successor == self.address:
+            # if we have a predecessor, then its a 2 node ring
+            # complete the circle
+            if self.predecessor and self.predecessor != self.address:
+                self.finger_table[0] = self.predecessor
             return
+
+
 
         x = None
 
