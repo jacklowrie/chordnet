@@ -290,8 +290,14 @@ class Node:
         #     set successor to x
         # notify successor about this node
         curr_successor = self.successor()
-        if curr_successor is None:
+        if curr_successor is None or curr_successor == self.address:
+            # if we have a predecessor, then its a 2 node ring
+            # complete the circle
+            if self.predecessor and self.predecessor != self.address:
+                self.finger_table[0] = self.predecessor
             return
+
+
 
         x = None
 
@@ -441,9 +447,11 @@ class Node:
             True if the node was accepted as a predecessor, False otherwise.
         """
         # Update predecessor if necessary
-        if not self.predecessor or self._is_between(
-                self.predecessor.key, self.address.key, notifying_node.key
-        ):
+        my_key = self.address.key
+        their_key = notifying_node.key
+        if not self.predecessor \
+                or self.predecessor == self.address \
+                or self._is_between(self.predecessor.key, my_key, their_key):
             self.predecessor = notifying_node
             return True
         else:
@@ -546,7 +554,8 @@ class Node:
                     [args[0], args[1], args[2]])
                 )
                 assert notifier is not None
-                return "OK" if self._be_notified(notifier) else "IGNORED"
+                new_predecessor = self._be_notified(notifier)
+                return "OK" if new_predecessor else "IGNORED"
 
             except (ValueError, AssertionError):
                 return "INVALID_NODE"
