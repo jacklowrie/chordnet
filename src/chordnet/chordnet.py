@@ -17,9 +17,7 @@ class ChordNet:
         Args:
             ip: IP address for the node.
             port: Port number to listen on.
-            daemon: whether to run the daemon.
-            interval: daemon interval.
-            debug: whether to print node state after every daemon run.
+            interval: daemon interval (how often to 'sync' with the network)
         """
         self._node = _Node(ip, port, interval=interval)
 
@@ -37,8 +35,8 @@ class ChordNet:
         An existing chordnet can be joined through any node already on the ring.
 
         Args:
-            known_ip (str): IP address of an existing node in the Chord ring.
-            known_port (int): Port number of the existing node.
+            known_ip: IP address of an existing node in the Chord ring.
+            known_port: Port number of the existing node.
         """
         self._node.join(known_ip, known_port)
 
