@@ -10,9 +10,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from chordnet import (
-    _Net,
-)
+from chordnet._net import _Net
 
 
 def test_net_initialization() -> None:

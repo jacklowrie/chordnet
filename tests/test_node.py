@@ -9,8 +9,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from chordnet import Address
-from chordnet import Node as ChordNode
+from chordnet._node import _Node as ChordNode
+from chordnet.address import Address
 
 # Global test variables
 ip: str = "1.2.3.4"

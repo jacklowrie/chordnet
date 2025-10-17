@@ -4,11 +4,11 @@ from typing import Callable, Tuple
 
 from loguru import logger as log
 
+from ._net import _Net
 from .address import Address
-from .net import _Net
 
 callback_t = Callable[[str, list[str]], str | Address | None]
-class Node:
+class _Node:
     """Implements a Chord distributed hash table node.
 
     This is meant to run on a host and handle any chord-related

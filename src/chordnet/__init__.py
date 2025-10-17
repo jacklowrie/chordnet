@@ -1,6 +1,4 @@
 """init.py: defines importable classes."""
-from .address import Address
-from .net import _Net
-from .node import Node
+from .chordnet import ChordNet
 
-__all__=['Node', 'Address', '_Net']
+__all__=['ChordNet']
