@@ -3,8 +3,7 @@ name: Documentation
 # build the documentation whenever there are new commits on main
 on:
   push:
-    branches:
-     tags:
+    tags:
        - '*'
 
 # security: restrict permissions for CI jobs.
