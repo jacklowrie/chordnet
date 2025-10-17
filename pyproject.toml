@@ -1,6 +1,6 @@
 [project]
 name = "chordnet"
-version = "2.0.0"
+version = "2.1.0"
 license = "MIT"
 license-files = ["LICENSE"]
 description = "Implementation of the chord peer-to-peer networking protocol, introduced by Stoica et al."
@@ -60,10 +60,20 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+
 requires-python = ">=3.10"
 dependencies = [
     "loguru>=0.7.3",
 ]
+
+[project.urls]
+Homepage = "https://github.com/jacklowrie/chordnet"
+Source = "https://github.com/jacklowrie/chordnet"
+Documentation = "https://jacklowrie.github.io/chordnet/chordnet.html"
+Issues = "https://github.com/jacklowrie/chordnet/issues"
+download = "https://github.com/jacklowrie/chordnet/releases"
+History = "https://github.com/jacklowrie/chordnet/releases"
+PyPI = "https://pypi.org/project/chordnet/"
 
 [build-system]
 requires = ["uv_build>=0.7.19,<0.8"]
