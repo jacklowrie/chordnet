@@ -1,6 +1,6 @@
 name: Documentation
 
-# build the documentation whenever there are new commits on main
+# build the documentation whenever there are new commits on main and for tags
 on:
   push:
     tags:
@@ -16,7 +16,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # setup
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
@@ -32,15 +31,50 @@ jobs:
       - name: Install chordnet dependencies
         run: uv sync --frozen --all-extras --dev
 
-      - name: Build docs
-        run: uv run pdoc -o docs/ chordnet
+      - name: Build library docs (public API)
+        run: |
+          # pdoc default generates only public (non-private) members
+          uv run pdoc -o docs/library chordnet
+
+      - name: Build developer docs (include private/internal)
+        run: |
+          # include private/internal members for developer docs
+          uv run pdoc --private -o docs/developer chordnet
+
+      - name: Write simple landing index
+        run: |
+          mkdir -p docs
+          cat > docs/index.html <<'HTML'
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width,initial-scale=1" />
+              <title>Chordnet documentation</title>
+              <style>
+                body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; max-width: 900px; margin: 3rem auto; padding: 0 1rem; }
+                h1 { margin-bottom: 0.25rem; }
+                p { color: #444; }
+                .links { margin-top: 1.25rem; }
+                .links a { display:inline-block; margin-right:1rem; padding: 0.5rem 0.75rem; background:#f3f4f6; color:#111; text-decoration:none; border-radius:6px; }
+              </style>
+            </head>
+            <body>
+              <h1>Chordnet documentation</h1>
+              <p>Choose the set of docs you want to view:</p>
+              <div class="links">
+                <a href="./library/">Library (public)</a>
+                <a href="./developer/">Developer (internal)</a>
+              </div>
+            </body>
+          </html>
+          HTML
 
       - uses: actions/upload-pages-artifact@v4
         with:
           path: docs/
 
-  # Deploy the artifact to GitHub pages.
-  # This is a separate job so that only actions/deploy-pages has the necessary permissions.
+  # Deploy the artifact to GitHub Pages.
   deploy:
     needs: build
     runs-on: ubuntu-latest
