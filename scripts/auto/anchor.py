@@ -2,8 +2,11 @@
 import sys
 
 import IPython
+from loguru import logger
 
-from chordnet import Node as ChordNode
+from chordnet._node import _Node as ChordNode
+
+logger.enable("chordnet")
 
 
 def main() -> None:

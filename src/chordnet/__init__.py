@@ -1,6 +1,8 @@
 """init.py: defines importable classes."""
-from .address import Address
-from .net import _Net
-from .node import Node
+from loguru import logger
 
-__all__=['Node', 'Address', '_Net']
+from .chordnet import ChordNet
+
+logger.disable("chordnet")
+
+__all__=['ChordNet']

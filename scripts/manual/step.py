@@ -1,6 +1,6 @@
 """step.py: helper for manual scripts."""
 
-from chordnet import Node as ChordNode
+from chordnet._node import _Node as ChordNode
 
 
 def step(node: ChordNode) -> None:

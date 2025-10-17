@@ -19,15 +19,25 @@ Fall 2024.
 
 `uv add chordnet`
 
-## Development
-See `CONTRIBUTING.md`.
 
 ## Usage
 to stay consistent with the language from the original paper, we recommend
-importing this package as `ring`:
+naming your chordnet attribute `ring`:
 ```python
-from chordnet import Node as ring
+from chordnet import ChordNet
+
+ring = new ChordNet(...)
+ring.create()
+# or ring.join(...)
+#...
+ring.leave()
 ```
 This fits with the concept of "joining" an existing ring network, or creating a
-new one, (`ring.join(...)`, `ring.create()`.
-Examples follow this practice.
+new one. Examples follow this practice.
+
+## Development
+See `CONTRIBUTING.md`.
+
+## Security
+If you discover a security issue, **please do not open a public issue**.
+See `SECURITY.md` for the full policy/reporting instructions.
