@@ -34,12 +34,12 @@ jobs:
       - name: Build library docs (public API)
         run: |
           # pdoc default generates only public (non-private) members
-          uv run pdoc -o docs/library chordnet
+          uv run pdoc --docformat google -o docs/library chordnet
 
       - name: Build developer docs (include private/internal)
         run: |
           # include private/internal members for developer docs
-          uv run pdoc --private -o docs/developer chordnet
+          uv run pdoc --docformat google --private -o docs/dev chordnet
 
       - name: Write simple landing index
         run: |
@@ -64,7 +64,7 @@ jobs:
               <p>Choose the set of docs you want to view:</p>
               <div class="links">
                 <a href="./library/">Library (public)</a>
-                <a href="./developer/">Developer (internal)</a>
+                <a href="./dev/">Developer (internal)</a>
               </div>
             </body>
           </html>
