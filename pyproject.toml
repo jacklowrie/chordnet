@@ -1,6 +1,6 @@
 [project]
 name = "chordnet"
-version = "2.0.0"
+version = "2.1.0"
 license = "MIT"
 license-files = ["LICENSE"]
 description = "Implementation of the chord peer-to-peer networking protocol, introduced by Stoica et al."
