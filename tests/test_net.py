@@ -9,8 +9,11 @@ from typing import Generator, List, Optional, Tuple
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
+from loguru import logger
 
 from chordnet._net import _Net
+
+logger.enable("chordnet")
 
 
 def test_net_initialization() -> None:

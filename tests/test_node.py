@@ -8,10 +8,12 @@ from typing import Any, Generator, Tuple
 from unittest.mock import MagicMock, patch
 
 import pytest
+from loguru import logger
 
 from chordnet._node import _Node as ChordNode
 from chordnet.address import Address
 
+logger.enable("chordnet")
 # Global test variables
 ip: str = "1.2.3.4"
 port: int = 5
