@@ -11,3 +11,6 @@ logger.enable("chordnet")
 ip: str = "127.0.0.1"
 anchor_port: int = 1234
 joiner_port: int = 2345
+
+# test with manual stepping of daemon
+# test with daemon running (eventual repair)
