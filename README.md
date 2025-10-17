@@ -36,8 +36,9 @@ This fits with the concept of "joining" an existing ring network, or creating a
 new one. Examples follow this practice.
 
 ## Development
-See `CONTRIBUTING.md`.
+See `CONTRIBUTING.md` [(here)](https://github.com/jacklowrie/chordnet?tab=contributing-ov-file).
 
 ## Security
 If you discover a security issue, **please do not open a public issue**.
-See `SECURITY.md` for the full policy/reporting instructions.
+See the [security policy](https://github.com/jacklowrie/chordnet/security/policy)
+for reporting instructions.
