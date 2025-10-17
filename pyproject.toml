@@ -119,13 +119,11 @@ convention = "google"
 python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
+mypy_path = "src"
 files = ["src", "tests", "scripts"]
 exclude = [
     '(^|.*/)__pycache__/',  # matches __pycache__ at any depth
     '(^|.*/).ruff_cache/',
     '(^|.*/).mypy_cache/',
+    '(^|.*/)dist/',
 ]
-
-[[tool.mypy.overrides]]
-module = ["bpython"]
-ignore_missing_imports = true

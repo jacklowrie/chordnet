@@ -3,7 +3,7 @@ import sys
 
 import IPython
 
-from chordnet import Node as ChordNode
+from chordnet._node import _Node as ChordNode
 
 
 def main() -> None:
