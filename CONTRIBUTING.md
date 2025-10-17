@@ -5,7 +5,7 @@ open issue you want to work on, please leave a comment on it - assigned issues
 are spearheaded by the assignee, if they need help they will coordinate on the
 issue.
 
-## Development
+## Development Environment
 This project uses `uv` and `pre-commit`.
 to install `uv`, you can use homebrew:
 ```sh
@@ -19,3 +19,10 @@ Once `uv` is installed, clone this repo, then run the following:
 uv sync --locked --all-extras --dev # this installs all dev dependencies, without upgrading any.
 uv run pre-commit install # sets up pre-commit
 ```
+
+## Organization
+This project uses a `src` layout. all tests are in the `tests` directory, and can be
+run with `pytest` from root. the `scripts` directory contains useful scripts for
+debugging nodes, including a set of "auto" scripts (which runs normally and periodically
+prints the finger table), and "manual" scripts (which include a step function, to manually
+run one iteration of the daemon and print the result".
