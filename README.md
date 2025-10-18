@@ -21,16 +21,40 @@ Fall 2024.
 
 
 ## Usage
-to stay consistent with the language from the original paper, we recommend
+To stay consistent with the language from the original paper, we recommend
 naming your chordnet attribute `ring`:
 ```python
 from chordnet import ChordNet
 
 ring = new ChordNet(...)
-ring.create()
-# or ring.join(...)
-#...
+ring.create() # or ring.join(...)
+#...application logic...
 ring.leave()
+# end program
 ```
 This fits with the concept of "joining" an existing ring network, or creating a
 new one. Examples follow this practice.
+
+At present, this package only supports IP lookup. All application-dependent
+logic (state transfer, etc) must be handled by the application.
+The easiest way to do this is to initialize ChordNet as an attribute on
+an application class:
+```python
+class App:
+    def __init__(self, ip: str, chordnet_port: int) -> None:
+        self._ring = ChordNet(ip, chordnet_port)
+
+    def start(
+        self, ip = None: str | None, port = None: int | None
+    ) -> None:
+        if ip and port:
+            self._ring.join(ip, port)
+        elif not ip and not port:
+            self._ring.create()
+        else:
+            print("need both or neither")
+            return
+    def stop(self) -> None:
+        self._ring.leave()
+```
+In future versions, we hope to support in-package state transfer.
