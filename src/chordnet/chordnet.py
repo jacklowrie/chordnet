@@ -1,5 +1,8 @@
 """chordnet.py: chordnet api."""
+from typing import Tuple
+
 from ._node import _Node
+from .address import Address
 
 
 class ChordNet:
@@ -43,6 +46,18 @@ class ChordNet:
         """
         self._node.join(known_ip, known_port)
 
+    def lookup(self, key: int) -> Tuple[str, int]:
+        """Finds the ip address of the node responsible for the given key.
+
+        Args:
+            key: the value to look up (the hash)
+
+        Returns: the IP address of the node responsible for the given key,
+                 and the port that key is listening for ChordNet traffic on.
+        """
+        result: Address = self._node.find_successor(key)
+        return result.ip, result.port
+
     def leave(self) -> None:
         """Leave the current network.
 
@@ -51,4 +66,4 @@ class ChordNet:
         program exit (or before a node shuts down in the network), but the
         network can still recover if this does not happen.
         """
-        pass
+        self._node.stop()
