@@ -41,20 +41,32 @@ The easiest way to do this is to initialize ChordNet as an attribute on
 an application class:
 ```python
 class App:
+    """An example/template application that uses ChordNet."""
     def __init__(self, ip: str, chordnet_port: int) -> None:
+        """Creates a new insance of the app."""
         self._ring = ChordNet(ip, chordnet_port)
 
     def start(
         self, ip = None: str | None, port = None: int | None
     ) -> None:
+        """Starts the app by joining an existing ring or creating a new one."""
         if ip and port:
             self._ring.join(ip, port)
+            # ...any state transfer logic, if part of this app...
         elif not ip and not port:
             self._ring.create()
         else:
             print("need both or neither")
             return
+
+    #...application logic (probably using self._ring.lookup()...
+
     def stop(self) -> None:
+        """Gracefully leaves the ring."""
+        # ...any state transfer logic (if using)...
         self._ring.leave()
 ```
-In future versions, we hope to support in-package state transfer.
+Not all distributed applications that ChordNet is suitable for will require
+state transfer logic (for example, search problems), and the nature of that
+logic will likely vary by app. In future versions, we hope to support
+in-library state transfer.
